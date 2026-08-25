@@ -1,8 +1,10 @@
 <meta charset="utf-8">
 <title>강동엽 캠프</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
   :root {
@@ -40,13 +42,17 @@
   }
 
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   body {
     margin: 0;
     background: var(--paper);
     color: var(--ink);
     font-family: 'Noto Sans KR', -apple-system, 'Malgun Gothic', sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   h1, h2, h3 { font-family: 'Noto Serif KR', 'Noto Sans KR', serif; text-wrap: balance; margin: 0; }
   p { text-wrap: pretty; }
@@ -128,7 +134,7 @@
   .hero-badge:hover { background: var(--navy); color: #fff; }
 
   /* Generic view padding */
-  .view-pad { padding: 72px 0 108px; }
+  .view-pad { padding-top: 72px; padding-bottom: 108px; }
 
   /* Intro */
   .intro-grid { display: grid; grid-template-columns: 300px 1fr; gap: 52px; align-items: start; }
@@ -177,8 +183,16 @@
   .press-card:hover .press-cta { color: var(--navy); }
 
   /* Board */
-  .board-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .board-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
   .board-sub { color: var(--ink-muted); font-size: 15px; }
+  .board-layout { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
+  .board-map { width: 100%; height: 280px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper-soft); font-family: 'Noto Sans KR', sans-serif; position: sticky; top: 88px; }
+  .board-map .leaflet-popup-content-wrapper { border-radius: 6px; }
+  .board-map .leaflet-popup-content { font-size: 12.5px; line-height: 1.6; margin: 10px 12px; }
+  .board-map .popup-title { font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .board-map .popup-meta { color: var(--ink-muted); }
+  .board-empty { padding: 44px 8px; text-align: center; color: var(--ink-muted); font-size: 14px; border-bottom: 1px solid var(--line); }
+  .board-map-fallback { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--ink-muted); font-size: 13px; text-align: center; padding: 0 24px; line-height: 1.6; }
   .btn-primary {
     height: 42px; padding: 0 20px; border-radius: 3px; border: none;
     background: var(--navy); color: #fff; font-size: 13.5px; font-weight: 700;
@@ -195,15 +209,26 @@
   .board-table tbody td { padding: 16px 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
   .board-table td.no, .board-table td.author, .board-table td.date { color: var(--ink-muted); }
   .board-table td.title { font-weight: 500; }
-  .col-no { width: 60px; } .col-author { width: 130px; } .col-date { width: 120px; }
+  .col-no { width: 60px; } .col-author { width: 110px; } .col-loc { width: 140px; } .col-date { width: 110px; }
+  .board-table td.loc { color: var(--ink-muted); }
 
   /* Write form */
   .field { margin-bottom: 20px; }
   .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1 1 0; margin-bottom: 0; }
   .field input[type="text"] {
     width: 100%; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 3px;
     font-size: 14px; color: var(--ink); background: var(--paper); outline: none;
   }
+  .field select {
+    width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 3px;
+    font-size: 14px; color: var(--ink); background: var(--paper); outline: none;
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%235b6472' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .field select:disabled { color: var(--ink-muted); background-color: var(--paper-soft); }
   .field textarea {
     width: 100%; height: 200px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 3px;
     font-size: 14px; color: var(--ink); background: var(--paper); outline: none; resize: vertical; line-height: 1.7;
@@ -238,6 +263,9 @@
     .slogan-row { flex-direction: column; gap: 20px; }
     .press-grid { grid-template-columns: 1fr; gap: 28px; }
     .focus-item { grid-template-columns: 1fr; gap: 6px; }
+    .board-layout { grid-template-columns: 1fr; }
+    .board-map { height: 220px; position: static; order: -1; margin-bottom: 8px; }
+    .field-row { flex-direction: column; gap: 20px; }
     .board-table thead { display: none; }
     .board-table tbody tr { display: grid; grid-template-columns: 1fr; padding: 12px 0; }
     .board-table tbody td { border: none; padding: 3px 8px; }
@@ -293,7 +321,7 @@
           </div>
           <div>
             <h1 class="intro-name">강동엽</h1>
-            <div class="intro-tag">능력은 나이에 비례하지 않습니다</div>
+            <div class="intro-tag">더불어민주당 전국대학생위원장 후보</div>
             <div class="intro-body">
               <p>2003년 대구광역시에서 태어나 매곡초등학교, 왕선중학교, 호산고등학교를 졸업했습니다. 2022년 영남대학교 정치외교학과에 입학했고, 2023년 8월부터 2025년 1월까지 대한민국 육군 병장으로 병역을 마쳤습니다.</p>
               <p>전역 이후 더불어민주당 대구광역시당 대학생위원장 수석부위원장, 청년정책연구소 유스폴랩 연구소장, 대구광역시 청년정책네트워크 위원 등을 거쳐 2025년 11월부터 더불어민주당 중앙위원으로 활동하고 있습니다. 비영리 사회단체 '윤슬'의 대표를 맡아 사회통합을 위한 공익활동도 이어왔습니다.</p>
@@ -426,18 +454,15 @@
           </div>
           <button class="btn-primary" id="go-write">글쓰기</button>
         </div>
-        <table class="board-table">
-          <thead>
-            <tr><th class="col-no">번호</th><th>제목</th><th class="col-author">작성자</th><th class="col-date">날짜</th></tr>
-          </thead>
-          <tbody id="board-body">
-            <tr><td class="no">5</td><td class="title">정책공약 응원합니다!</td><td class="author">시민A</td><td class="date">2026.08.20</td></tr>
-            <tr><td class="no">4</td><td class="title">지역 교통 문제 관련 제안드립니다</td><td class="author">시민B</td><td class="date">2026.08.18</td></tr>
-            <tr><td class="no">3</td><td class="title">응원합니다 화이팅!</td><td class="author">시민C</td><td class="date">2026.08.15</td></tr>
-            <tr><td class="no">2</td><td class="title">교육 정책에 대한 의견입니다</td><td class="author">시민D</td><td class="date">2026.08.10</td></tr>
-            <tr><td class="no">1</td><td class="title">첫 게시글입니다</td><td class="author">시민E</td><td class="date">2026.08.01</td></tr>
-          </tbody>
-        </table>
+        <div class="board-layout">
+          <table class="board-table">
+            <thead>
+              <tr><th class="col-no">번호</th><th>제목</th><th class="col-author">작성자</th><th class="col-loc">위치</th><th class="col-date">날짜</th></tr>
+            </thead>
+            <tbody id="board-body"></tbody>
+          </table>
+          <div class="board-map" id="board-map"><div class="board-map-fallback">지도를 불러올 수 없습니다.<br>실제 배포된 사이트에서 확인해주세요.</div></div>
+        </div>
       </div>
     </section>
 
@@ -454,6 +479,17 @@
           <input type="text" id="w-author" placeholder="이름을 입력하세요">
         </div>
         <div class="field">
+          <label>위치</label>
+          <div class="field-row">
+            <div class="field">
+              <select id="w-sido"><option value="">시/도 선택</option></select>
+            </div>
+            <div class="field">
+              <select id="w-sigungu" disabled><option value="">시/군/구 선택</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
           <label>사진 첨부</label>
           <button class="attach-btn" id="w-attach" type="button">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M8 12l6.5-6.5a3 3 0 114.24 4.24L11.5 17a5 5 0 11-7.07-7.07L12 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -463,7 +499,7 @@
         <div class="field">
           <label for="w-content">내용</label>
           <textarea id="w-content" placeholder="응원 또는 제안 내용을 자유롭게 작성해주세요"></textarea>
-          <div class="form-hint" id="w-hint">제목과 작성자를 입력해주세요.</div>
+          <div class="form-hint" id="w-hint">제목, 작성자, 위치(시/도·시/군/구)를 입력해주세요.</div>
         </div>
         <div class="form-actions">
           <button class="btn-ghost" id="w-cancel">취소</button>
@@ -489,14 +525,231 @@
         else b.removeAttribute('aria-current');
       });
       window.scrollTo({ top: 0, behavior: 'auto' });
+      if (name === 'board' && boardMap) {
+        setTimeout(function () { boardMap.invalidateSize(); }, 0);
+      }
     }
     navButtons.forEach(function (b) {
       b.addEventListener('click', function () { showView(b.dataset.nav); });
     });
 
+    // Location data (시/도 -> 시/군/구 -> [lat, lng])
+    var KOREA_REGIONS = {
+      "서울특별시": {
+        "강남구": [37.4951, 127.06278], "강동구": [37.55274, 127.14546], "강북구": [37.6349, 127.02015],
+        "강서구": [37.56227, 126.81622], "관악구": [37.47876, 126.95235], "광진구": [37.53913, 127.08366],
+        "구로구": [37.49447, 126.8502], "금천구": [37.47486, 126.89106], "노원구": [37.66045, 127.06718],
+        "도봉구": [37.65066, 127.03011], "동대문구": [37.58189, 127.05408], "동작구": [37.50056, 126.95149],
+        "마포구": [37.55438, 126.90926], "서대문구": [37.57809, 126.93635], "서초구": [37.4809, 127.0328],
+        "성동구": [37.55107, 127.04146], "성북구": [37.59268, 127.01682], "송파구": [37.5052, 127.11294],
+        "양천구": [37.52643, 126.86529], "영등포구": [37.52527, 126.90144], "용산구": [37.53155, 126.98055],
+        "은평구": [37.60272, 126.92639], "종로구": [37.5921, 126.97934], "중구": [37.5636, 126.99756],
+        "중랑구": [37.60618, 127.09256]
+      },
+      "부산광역시": {
+        "강서구": [35.14956, 128.98014], "금정구": [35.24263, 129.09228], "기장군": [35.24421, 129.21847],
+        "남구": [35.13674, 129.08373], "동구": [35.13023, 129.04544], "동래구": [35.19951, 129.08536],
+        "부산진구": [35.15949, 129.05282], "북구": [35.19974, 128.9906], "사상구": [35.14898, 128.98988],
+        "사하구": [35.10442, 128.97441], "서구": [35.09742, 129.02405], "수영구": [35.14456, 129.11305],
+        "연제구": [35.17618, 129.07964], "영도구": [35.09115, 129.06792], "중구": [35.10621, 129.03217],
+        "해운대구": [35.16315, 129.16354]
+      },
+      "대구광역시": {
+        "남구": [35.84605, 128.5798], "달서구": [35.82964, 128.53243], "달성군": [35.77467, 128.42955],
+        "동구": [35.88687, 128.63548], "북구": [35.88582, 128.5828], "서구": [35.87181, 128.55917],
+        "수성구": [35.85825, 128.63067], "중구": [35.86927, 128.60633]
+      },
+      "인천광역시": {
+        "강화군": [37.7466, 126.48489], "계양구": [37.53745, 126.7379], "남동구": [37.44693, 126.73137],
+        "동구": [37.47367, 126.64335], "미추홀구": [37.4634, 126.65083], "부평구": [37.50699, 126.72159],
+        "서구": [37.54561, 126.67582], "연수구": [37.41031, 126.67862], "옹진군": [37.44614, 126.63722],
+        "중구": [37.46421, 126.63074]
+      },
+      "광주광역시": {
+        "광산구": [35.13938, 126.79345], "남구": [35.13245, 126.90212], "동구": [35.14615, 126.9316],
+        "북구": [35.17441, 126.91191], "서구": [35.15195, 126.88962]
+      },
+      "대전광역시": {
+        "대덕구": [36.34719, 127.41577], "동구": [36.31174, 127.4548], "서구": [36.35545, 127.38333],
+        "유성구": [36.36219, 127.35634], "중구": [36.32552, 127.4214]
+      },
+      "울산광역시": {
+        "남구": [35.54393, 129.33018], "동구": [35.50472, 129.41637], "북구": [35.58244, 129.36116],
+        "울주군": [35.56233, 129.1269], "중구": [35.56937, 129.31111]
+      },
+      "세종특별자치시": {
+        "세종특별자치시": [36.48, 127.289]
+      },
+      "경기도": {
+        "가평군": [37.83109, 127.5097], "고양시": [37.65845, 126.832], "과천시": [37.42917, 126.98747],
+        "광명시": [37.4784, 126.86466], "광주시": [37.40967, 127.25508], "구리시": [37.5943, 127.13943],
+        "군포시": [37.35894, 126.93513], "김포시": [37.6153, 126.71576], "남양주시": [37.63615, 127.21654],
+        "동두천시": [37.90277, 127.05903], "부천시": [37.50389, 126.7661], "성남시": [37.42, 127.12652],
+        "수원시": [37.26333, 127.02867], "시흥시": [37.38, 126.80278], "안산시": [37.31972, 126.83028],
+        "안성시": [37.00806, 127.27972], "안양시": [37.39472, 126.95694], "양주시": [37.7854, 127.04588],
+        "양평군": [37.4914, 127.4874], "여주시": [37.29806, 127.6375], "연천군": [38.0966, 127.0748],
+        "오산시": [37.15367, 127.07751], "용인시": [37.24111, 127.17750], "의왕시": [37.34472, 126.96833],
+        "의정부시": [37.73778, 127.03444], "이천시": [37.27222, 127.435], "파주시": [37.7602, 126.7799],
+        "평택시": [36.99222, 127.11278], "포천시": [37.89467, 127.20017], "하남시": [37.53944, 127.21472],
+        "화성시": [37.19944, 126.83139]
+      },
+      "강원도": {
+        "강릉시": [37.75194, 128.87639], "고성군": [38.3806, 128.4678], "동해시": [37.52472, 129.11417],
+        "삼척시": [37.44639, 129.16528], "속초시": [38.20694, 128.59139], "양구군": [38.1096, 127.9898],
+        "양양군": [38.0754, 128.6191], "영월군": [37.1836, 128.4617], "원주시": [37.34222, 127.92028],
+        "인제군": [38.0696, 128.17], "정선군": [37.3805, 128.6608], "철원군": [38.1466, 127.3132],
+        "춘천시": [37.88139, 127.72972], "태백시": [37.16444, 128.985], "평창군": [37.3705, 128.3906],
+        "홍천군": [37.6971, 127.8887], "화천군": [38.1063, 127.7083], "횡성군": [37.4916, 128.0473]
+      },
+      "충청북도": {
+        "괴산군": [36.815, 127.7867], "단양군": [36.9846, 128.3656], "보은군": [36.4894, 127.7295],
+        "영동군": [36.1751, 127.7838], "옥천군": [36.3062, 127.5716], "음성군": [36.9403, 127.6902],
+        "제천시": [37.13139, 128.19083], "증평군": [36.7855, 127.5813], "진천군": [36.8556, 127.4358],
+        "청주시": [36.64222, 127.48972], "충주시": [36.99083, 127.92583]
+      },
+      "충청남도": {
+        "계룡시": [36.2745, 127.2487], "공주시": [36.44667, 127.11889], "금산군": [36.1088, 127.4881],
+        "논산시": [36.18694, 127.09861], "당진시": [36.8896, 126.6459], "보령시": [36.33333, 126.61278],
+        "부여군": [36.2758, 126.9096], "서산시": [36.78472, 126.45028], "서천군": [36.0803, 126.6919],
+        "아산시": [36.78972, 127.00278], "예산군": [36.6812, 126.845], "천안시": [36.815, 127.11389],
+        "청양군": [36.4592, 126.8022], "태안군": [36.7452, 126.2977], "홍성군": [36.6014, 126.6608]
+      },
+      "전라북도": {
+        "고창군": [35.4357, 126.702], "군산시": [35.96778, 126.73667], "김제시": [35.80333, 126.88083],
+        "남원시": [35.41639, 127.39028], "무주군": [36.0069, 127.6608], "부안군": [35.7317, 126.7333],
+        "순창군": [35.3745, 127.1374], "완주군": [35.9046, 127.1618], "익산시": [35.94833, 126.95778],
+        "임실군": [35.6178, 127.2891], "장수군": [35.6472, 127.5209], "전주시": [35.82194, 127.14889],
+        "정읍시": [35.57, 126.855], "진안군": [35.7917, 127.4249]
+      },
+      "전라남도": {
+        "강진군": [34.6421, 126.7671], "고흥군": [34.6113, 127.2851], "곡성군": [35.2819, 127.2921],
+        "광양시": [34.94056, 127.6955], "구례군": [35.2024, 127.4629], "나주시": [35.01583, 126.71667],
+        "담양군": [35.3211, 126.9882], "목포시": [34.81167, 126.39222], "무안군": [34.9905, 126.4816],
+        "보성군": [34.7715, 127.0799], "순천시": [34.95028, 127.48778], "신안군": [34.8319, 126.1067],
+        "여수시": [34.76028, 127.66222], "영광군": [35.2772, 126.5119], "영암군": [34.8, 126.6967],
+        "완도군": [34.3111, 126.7551], "장성군": [35.3018, 126.7847], "장흥군": [34.6813, 126.9066],
+        "진도군": [34.4867, 126.2633], "함평군": [35.0658, 126.5165], "해남군": [34.5732, 126.5992],
+        "화순군": [35.0645, 126.9864]
+      },
+      "경상북도": {
+        "경산시": [35.825, 128.7414], "경주시": [35.85639, 129.22417], "고령군": [35.7264, 128.2629],
+        "구미시": [36.11944, 128.34472], "군위군": [36.2429, 128.5726], "김천시": [36.13972, 128.11333],
+        "문경시": [36.5867, 128.1867], "봉화군": [36.8932, 128.7326], "상주시": [36.41056, 128.15889],
+        "성주군": [35.919, 128.2827], "안동시": [36.56333, 128.72917], "영덕군": [36.4151, 129.3656],
+        "영양군": [36.6664, 129.1123], "영주시": [36.805, 128.62361], "영천시": [35.97306, 128.93861],
+        "예천군": [36.6577, 128.4531], "울릉군": [37.4844, 130.9057], "울진군": [36.9931, 129.4004],
+        "의성군": [36.3527, 128.6971], "청도군": [35.6474, 128.7338], "청송군": [36.4359, 129.057],
+        "칠곡군": [35.9955, 128.4016], "포항시": [36.03806, 129.34278]
+      },
+      "경상남도": {
+        "거제시": [34.88056, 128.62139], "거창군": [35.6866, 127.9095], "고성군": [34.9733, 128.3229],
+        "김해시": [35.22833, 128.88944], "남해군": [34.8375, 127.8925], "밀양시": [35.50361, 128.74639],
+        "사천시": [35.00389, 128.06417], "산청군": [35.4156, 127.8734], "양산시": [35.335, 129.0378],
+        "의령군": [35.3222, 128.2617], "진주시": [35.18028, 128.10778], "창녕군": [35.5444, 128.4922],
+        "창원시": [35.22806, 128.68111], "통영시": [34.85417, 128.43333], "하동군": [35.0674, 127.7511],
+        "함안군": [35.2724, 128.4064], "함양군": [35.5203, 127.7253], "합천군": [35.5666, 128.1656]
+      },
+      "제주특별자치도": {
+        "서귀포시": [33.25417, 126.56028], "제주시": [33.49889, 126.53111]
+      }
+    };
+
+    // Deterministic small offset so posts sharing a district don't fully overlap
+    function jitterOffset(seed) {
+      var a = Math.sin(seed * 9301 + 49297) * 233280;
+      var b = Math.sin(seed * 6151 + 12345) * 233280;
+      return [((a - Math.floor(a)) - 0.5) * 0.06, ((b - Math.floor(b)) - 0.5) * 0.06];
+    }
+
+    // Location selects
+    var sidoSelect = document.getElementById('w-sido');
+    var sigunguSelect = document.getElementById('w-sigungu');
+    Object.keys(KOREA_REGIONS).forEach(function (sido) {
+      var opt = document.createElement('option');
+      opt.value = sido;
+      opt.textContent = sido;
+      sidoSelect.appendChild(opt);
+    });
+    sidoSelect.addEventListener('change', function () {
+      sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
+      var sido = sidoSelect.value;
+      if (!sido) { sigunguSelect.disabled = true; return; }
+      var list = Object.keys(KOREA_REGIONS[sido]);
+      list.forEach(function (sgg) {
+        var opt = document.createElement('option');
+        opt.value = sgg;
+        opt.textContent = sgg;
+        sigunguSelect.appendChild(opt);
+      });
+      sigunguSelect.disabled = false;
+      if (list.length === 1) { sigunguSelect.value = list[0]; }
+    });
+
+    // Map (needs network access to unpkg.com + OpenStreetMap tiles — works on the
+    // deployed site, not inside the sandboxed artifact preview)
+    var boardMap = null;
+    var markerLayer = null;
+    if (typeof L !== 'undefined') {
+      try {
+        var mapEl = document.getElementById('board-map');
+        mapEl.innerHTML = '';
+        boardMap = L.map(mapEl, { scrollWheelZoom: false }).setView([36.4, 127.9], 6.6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(boardMap);
+        markerLayer = L.layerGroup().addTo(boardMap);
+      } catch (e) { boardMap = null; markerLayer = null; }
+    }
+
+    function renderMarkers() {
+      if (!markerLayer) return;
+      markerLayer.clearLayers();
+      boardPosts.forEach(function (p) {
+        var off = jitterOffset(p.no);
+        var marker = L.marker([p.lat + off[0], p.lng + off[1]]).addTo(markerLayer);
+        var content = document.createElement('div');
+        var t = document.createElement('div');
+        t.className = 'popup-title';
+        t.textContent = p.title;
+        var m = document.createElement('div');
+        m.className = 'popup-meta';
+        m.textContent = p.author + ' · ' + p.sido + ' ' + p.sigungu;
+        content.appendChild(t);
+        content.appendChild(m);
+        marker.bindPopup(content);
+      });
+    }
+
     // Board
     var boardBody = document.getElementById('board-body');
-    var nextNo = 6;
+    var boardPosts = [];
+    var nextNo = 1;
+
+    function renderBoard() {
+      boardBody.innerHTML = '';
+      if (boardPosts.length === 0) {
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.colSpan = 5;
+        td.className = 'board-empty';
+        td.textContent = '아직 등록된 글이 없습니다. 첫 번째 글을 남겨보세요.';
+        tr.appendChild(td);
+        boardBody.appendChild(tr);
+        return;
+      }
+      boardPosts.slice().sort(function (a, b) { return b.no - a.no; }).forEach(function (p) {
+        var row = document.createElement('tr');
+        row.innerHTML = '<td class="no"></td><td class="title"></td><td class="author"></td><td class="loc"></td><td class="date"></td>';
+        row.querySelector('.no').textContent = p.no;
+        row.querySelector('.title').textContent = p.title;
+        row.querySelector('.author').textContent = p.author;
+        row.querySelector('.loc').textContent = p.sido.replace(/(특별자치시|특별자치도|광역시|특별시|도)$/, '') + ' ' + p.sigungu;
+        row.querySelector('.date').textContent = p.date;
+        boardBody.appendChild(row);
+      });
+    }
+
     document.getElementById('go-write').addEventListener('click', function () { showView('write'); });
     document.getElementById('w-cancel').addEventListener('click', function () { resetWriteForm(); showView('board'); });
 
@@ -513,6 +766,9 @@
       document.getElementById('w-title').value = '';
       document.getElementById('w-author').value = '';
       document.getElementById('w-content').value = '';
+      sidoSelect.value = '';
+      sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
+      sigunguSelect.disabled = true;
       attachOn = false;
       attachBtn.classList.remove('on');
       attachLabel.textContent = '사진 선택';
@@ -522,22 +778,26 @@
     document.getElementById('w-submit').addEventListener('click', function () {
       var title = document.getElementById('w-title').value.trim();
       var author = document.getElementById('w-author').value.trim();
-      if (!title || !author) {
+      var sido = sidoSelect.value;
+      var sigungu = sigunguSelect.value;
+      if (!title || !author || !sido || !sigungu) {
         document.getElementById('w-hint').classList.add('show');
         return;
       }
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td class="no">' + nextNo + '</td>' +
-        '<td class="title"></td>' +
-        '<td class="author"></td>' +
-        '<td class="date">2026.08.25</td>';
-      tr.querySelector('.title').textContent = title;
-      tr.querySelector('.author').textContent = author;
-      boardBody.insertBefore(tr, boardBody.firstChild);
+      var coords = KOREA_REGIONS[sido][sigungu];
+      boardPosts.push({
+        no: nextNo, title: title, author: author, date: '2026.08.25',
+        sido: sido, sigungu: sigungu, lat: coords[0], lng: coords[1]
+      });
       nextNo += 1;
+      renderBoard();
+      renderMarkers();
       resetWriteForm();
       showView('board');
     });
+
+    renderBoard();
+    renderMarkers();
   })();
 </script>
+
