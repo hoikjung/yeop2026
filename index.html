@@ -212,16 +212,19 @@
     height: 42px; padding: 0 20px; border-radius: 3px; border: 1px solid var(--line);
     background: var(--paper); color: var(--ink); font-size: 13.5px; font-weight: 600;
   }
-  table.board-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--ink); font-variant-numeric: tabular-nums; }
-  .board-table thead th {
-    text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--line);
-    font-size: 12.5px; font-weight: 700; color: var(--ink-muted); text-transform: none;
+  .board-list { border-top: 2px solid var(--ink); font-variant-numeric: tabular-nums; }
+  .board-row {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    padding: 17px 4px; border: none; border-bottom: 1px solid var(--line);
+    background: none; text-align: left; cursor: pointer; font-family: inherit;
   }
-  .board-table tbody td { padding: 16px 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
-  .board-table td.no, .board-table td.author, .board-table td.date { color: var(--ink-muted); }
-  .board-table td.title { font-weight: 500; }
-  .col-no { width: 60px; } .col-author { width: 110px; } .col-loc { width: 140px; } .col-date { width: 110px; }
-  .board-table td.loc { color: var(--ink-muted); }
+  .board-row-no { flex: 0 0 auto; width: 24px; color: var(--ink-muted); font-size: 13px; }
+  .board-row-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .board-row-title { display: block; font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); }
+  .board-row-meta { display: block; font-size: 12.5px; color: var(--ink-muted); }
+  .board-row-chevron { flex: 0 0 auto; color: var(--line); display: flex; }
+  .board-row:hover .board-row-title { color: var(--navy); }
+  .board-row:hover .board-row-chevron { color: var(--navy); }
 
   /* Write form */
   .field { margin-bottom: 20px; }
@@ -277,10 +280,7 @@
     .board-layout { grid-template-columns: 1fr; }
     .board-map { height: 220px; position: static; order: -1; margin-bottom: 8px; }
     .field-row { flex-direction: column; gap: 20px; }
-    .board-table thead { display: none; }
-    .board-table tbody tr { display: grid; grid-template-columns: 1fr; padding: 12px 0; }
-    .board-table tbody td { border: none; padding: 3px 8px; }
-    .board-table td.title { order: -1; font-size: 15px; }
+    .board-row { padding: 15px 2px; }
   }
 </style>
 
@@ -490,21 +490,27 @@
     <!-- BOARD -->
     <section class="view" id="view-board" data-view="board">
       <div class="wrap view-pad">
-        <div class="board-head">
-          <div>
-            <h1 style="font-size:27px;">응원·제안</h1>
-            <div class="board-sub" style="margin-top:8px;">자유롭게 의견을 남겨주세요</div>
+        <div id="board-list-wrap">
+          <div class="board-head">
+            <div>
+              <h1 style="font-size:27px;">응원·제안</h1>
+              <div class="board-sub" style="margin-top:8px;">자유롭게 의견을 남겨주세요</div>
+            </div>
+            <button class="btn-primary" id="go-write">글쓰기</button>
           </div>
-          <button class="btn-primary" id="go-write">글쓰기</button>
+          <div class="board-layout">
+            <div class="board-list" id="board-body"></div>
+            <div class="board-map" id="board-map"><div class="board-map-fallback">지도를 불러올 수 없습니다.<br>실제 배포된 사이트에서 확인해주세요.</div></div>
+          </div>
         </div>
-        <div class="board-layout">
-          <table class="board-table">
-            <thead>
-              <tr><th class="col-no">번호</th><th>제목</th><th class="col-author">작성자</th><th class="col-loc">위치</th><th class="col-date">날짜</th></tr>
-            </thead>
-            <tbody id="board-body"></tbody>
-          </table>
-          <div class="board-map" id="board-map"><div class="board-map-fallback">지도를 불러올 수 없습니다.<br>실제 배포된 사이트에서 확인해주세요.</div></div>
+        <div id="board-detail-wrap" hidden>
+          <button class="back-link" id="board-back">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            목록으로
+          </button>
+          <h2 class="detail-title" id="board-detail-title"></h2>
+          <div class="detail-date" id="board-detail-meta"></div>
+          <p class="detail-body" id="board-detail-body"></p>
         </div>
       </div>
     </section>
@@ -573,7 +579,10 @@
       }
     }
     navButtons.forEach(function (b) {
-      b.addEventListener('click', function () { showView(b.dataset.nav); });
+      b.addEventListener('click', function () {
+        if (boardListWrap && boardDetailWrap) { boardDetailWrap.hidden = true; boardListWrap.hidden = false; }
+        showView(b.dataset.nav);
+      });
     });
 
     // Location data (시/도 -> 시/군/구 -> [lat, lng])
@@ -770,30 +779,54 @@
     var boardBody = document.getElementById('board-body');
     var boardPosts = [];
 
+    function shortSido(sido) {
+      return sido.replace(/(특별자치시|특별자치도|광역시|특별시|도)$/, '');
+    }
+
     function renderBoard() {
       boardBody.innerHTML = '';
       if (boardPosts.length === 0) {
-        var tr = document.createElement('tr');
-        var td = document.createElement('td');
-        td.colSpan = 5;
-        td.className = 'board-empty';
-        td.textContent = '아직 등록된 글이 없습니다. 첫 번째 글을 남겨보세요.';
-        tr.appendChild(td);
-        boardBody.appendChild(tr);
+        var empty = document.createElement('div');
+        empty.className = 'board-empty';
+        empty.textContent = '아직 등록된 글이 없습니다. 첫 번째 글을 남겨보세요.';
+        boardBody.appendChild(empty);
         return;
       }
       var total = boardPosts.length;
       boardPosts.forEach(function (p, i) {
-        var row = document.createElement('tr');
-        row.innerHTML = '<td class="no"></td><td class="title"></td><td class="author"></td><td class="loc"></td><td class="date"></td>';
-        row.querySelector('.no').textContent = total - i;
-        row.querySelector('.title').textContent = p.title;
-        row.querySelector('.author').textContent = p.author;
-        row.querySelector('.loc').textContent = p.sido.replace(/(특별자치시|특별자치도|광역시|특별시|도)$/, '') + ' ' + p.sigungu;
-        row.querySelector('.date').textContent = p.date;
+        var row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'board-row';
+        row.innerHTML =
+          '<span class="board-row-no"></span>' +
+          '<span class="board-row-main"><span class="board-row-title"></span><span class="board-row-meta"></span></span>' +
+          '<span class="board-row-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+        row.querySelector('.board-row-no').textContent = total - i;
+        row.querySelector('.board-row-title').textContent = p.title;
+        row.querySelector('.board-row-meta').textContent = p.author + ' · ' + shortSido(p.sido) + ' ' + p.sigungu + ' · ' + p.date;
+        row.addEventListener('click', function () { openPostDetail(i); });
         boardBody.appendChild(row);
       });
     }
+
+    var boardListWrap = document.getElementById('board-list-wrap');
+    var boardDetailWrap = document.getElementById('board-detail-wrap');
+    function openPostDetail(i) {
+      var p = boardPosts[i];
+      if (!p) return;
+      document.getElementById('board-detail-title').textContent = p.title;
+      document.getElementById('board-detail-meta').textContent =
+        p.author + ' · ' + shortSido(p.sido) + ' ' + p.sigungu + ' · ' + p.date;
+      document.getElementById('board-detail-body').textContent =
+        p.content && p.content.trim() ? p.content : '작성된 내용이 없습니다.';
+      boardListWrap.hidden = true;
+      boardDetailWrap.hidden = false;
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    document.getElementById('board-back').addEventListener('click', function () {
+      boardDetailWrap.hidden = true;
+      boardListWrap.hidden = false;
+    });
 
     function todayStr() {
       var d = new Date();
@@ -874,9 +907,10 @@
         hint.classList.add('show');
         return;
       }
+      var content = document.getElementById('w-content').value.trim();
       var coords = KOREA_REGIONS[sido][sigungu];
       var postData = {
-        title: title, author: author, sido: sido, sigungu: sigungu,
+        title: title, author: author, content: content, sido: sido, sigungu: sigungu,
         lat: coords[0], lng: coords[1], date: todayStr()
       };
 
