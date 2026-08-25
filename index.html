@@ -197,7 +197,8 @@
   .board-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
   .board-sub { color: var(--ink-muted); font-size: 15px; }
   .board-layout { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
-  .board-map { width: 100%; height: 280px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper-soft); font-family: 'Noto Sans KR', sans-serif; position: sticky; top: 88px; }
+  .board-map-wrap { position: sticky; top: 88px; }
+  .board-map { width: 100%; height: 280px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper-soft); font-family: 'Noto Sans KR', sans-serif; }
   .board-map .leaflet-popup-content-wrapper { border-radius: 6px; }
   .board-map .leaflet-popup-content { font-size: 12.5px; line-height: 1.6; margin: 10px 12px; }
   .board-map .popup-title { font-weight: 700; color: var(--ink); margin-bottom: 2px; }
@@ -278,7 +279,8 @@
     .press-grid { grid-template-columns: 1fr; gap: 28px; }
     .focus-item { grid-template-columns: 1fr; gap: 6px; }
     .board-layout { grid-template-columns: 1fr; }
-    .board-map { height: 220px; position: static; order: -1; margin-bottom: 8px; }
+    .board-map-wrap { position: static; order: -1; margin-bottom: 8px; }
+    .board-map { height: 220px; }
     .field-row { flex-direction: column; gap: 20px; }
     .board-row { padding: 15px 2px; }
   }
@@ -500,7 +502,9 @@
           </div>
           <div class="board-layout">
             <div class="board-list" id="board-body"></div>
-            <div class="board-map" id="board-map"><div class="board-map-fallback">지도를 불러올 수 없습니다.<br>실제 배포된 사이트에서 확인해주세요.</div></div>
+            <div class="board-map-wrap">
+              <div class="board-map" id="board-map"><div class="board-map-fallback">지도를 불러올 수 없습니다.<br>실제 배포된 사이트에서 확인해주세요.</div></div>
+            </div>
           </div>
         </div>
         <div id="board-detail-wrap" hidden>
