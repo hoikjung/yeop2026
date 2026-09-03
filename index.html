@@ -43,6 +43,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   body {
     margin: 0;
@@ -80,12 +81,7 @@
     border-bottom: 1px solid var(--line);
   }
   .brand { display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; flex-shrink: 0; }
-  .brand-mark {
-    width: 34px; height: 34px; border-radius: 3px; flex-shrink: 0;
-    background: var(--navy); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 15px; font-family: 'Noto Serif KR', serif;
-  }
+  .brand-mark { height: 30px; width: auto; flex-shrink: 0; display: block; }
   .brand-name { font-family: 'Noto Serif KR', serif; font-weight: 900; font-size: 18px; color: var(--ink); letter-spacing: -0.01em; white-space: nowrap; }
   .brand-role { font-size: 11px; color: var(--ink-muted); letter-spacing: 0.02em; margin-top: 1px; white-space: nowrap; }
   .brand-text { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
@@ -137,6 +133,28 @@
   }
   .hero-badge:hover { background: var(--navy); color: #fff; }
 
+  /* Home — résumé summary below the hero */
+  .resume-wrap { max-width: 1100px; margin: 0 auto; padding: 76px clamp(20px, 4vw, 44px) 100px; }
+  .resume-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  .resume-group { margin-bottom: 40px; }
+  .resume-group:last-child { margin-bottom: 0; }
+  .resume-group h3 {
+    font-size: 12.5px; font-weight: 800; letter-spacing: 0.05em; color: var(--navy);
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--ink);
+  }
+  .resume-list { list-style: none; margin: 0; padding: 0; }
+  .resume-list li {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.5;
+  }
+  .resume-list li:last-child { border-bottom: none; }
+  .resume-role { color: var(--ink); }
+  .resume-status { flex: 0 0 auto; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-muted); }
+  .resume-status::before { content: '('; }
+  .resume-status::after { content: ')'; }
+  .resume-status.current { color: var(--navy); }
+  .resume-status.former { color: var(--ink-muted); font-weight: 600; }
+
   /* Generic view padding */
   .view-pad { padding-top: 72px; padding-bottom: 108px; }
 
@@ -169,6 +187,21 @@
   }
   .t-item.milestone .t-year { color: var(--navy); }
   .t-item.milestone .t-text { font-weight: 700; color: var(--ink); }
+  .t-item.award .t-arrow {
+    position: absolute; left: -41px; top: 3px; width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center; color: var(--navy);
+  }
+
+  /* Sub-sections within a page (awards, story blocks) */
+  .section-sub { margin-top: 84px; }
+  .section-sub h2 { font-size: 19px; margin-bottom: 8px; }
+  .section-sub .section-lede { font-size: 13.5px; color: var(--ink-muted); margin-bottom: 36px; }
+  .story-list { display: flex; flex-direction: column; }
+  .story-item { padding: 26px 0; border-top: 1px solid var(--line); }
+  .story-item:last-child { border-bottom: 1px solid var(--line); }
+  .story-title { font-size: 15.5px; font-weight: 800; margin-bottom: 10px; color: var(--ink); }
+  .story-text { font-size: 14px; line-height: 1.85; color: var(--ink-muted); max-width: 66ch; }
+  .misc-line { font-size: 13.5px; color: var(--ink-muted); margin-top: 18px; }
 
   /* Policy — editorial focus list, not a card grid */
   .policy-sub { color: var(--ink-muted); font-size: 15px; line-height: 1.7; margin-bottom: 48px; max-width: 60ch; }
@@ -216,6 +249,8 @@
     height: 42px; padding: 0 20px; border-radius: 3px; border: 1px solid var(--line);
     background: var(--paper); color: var(--ink); font-size: 13.5px; font-weight: 600;
   }
+  .detail-owner-actions { display: flex; gap: 10px; margin-top: 32px; }
+  .detail-owner-actions .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
   .board-list { border-top: 2px solid var(--ink); font-variant-numeric: tabular-nums; }
   .board-row {
     display: flex; align-items: center; gap: 14px; width: 100%;
@@ -271,7 +306,6 @@
     .hero-media { min-height: 220px; }
   }
   @media (max-width: 560px) {
-    .brand-role { display: none; }
     .site-header { height: 60px; }
     .nav button { height: 60px; }
   }
@@ -286,16 +320,17 @@
     .board-map { height: 220px; }
     .field-row { flex-direction: column; gap: 20px; }
     .board-row { padding: 15px 2px; }
+    .resume-grid { grid-template-columns: 1fr; gap: 8px; }
+    .resume-wrap { padding-top: 56px; }
   }
 </style>
 
 <div class="site">
   <header class="site-header">
     <button class="brand" data-nav="home" aria-label="홈으로">
-      <span class="brand-mark">강</span>
+      <img class="brand-mark" src="data:image/png;base64,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" alt="더불어민주당 로고">
       <span class="brand-text">
-        <span class="brand-name">강동엽</span>
-        <span class="brand-role">더불어민주당 전국대학생위원장 후보</span>
+        <span class="brand-name">모두의 대학위</span>
       </span>
     </button>
     <ul class="nav">
@@ -336,6 +371,48 @@
         </div>
       </div>
 
+      <div class="resume-wrap">
+        <div class="resume-grid">
+          <div class="resume-col">
+            <div class="resume-group">
+              <h3>정당 이력</h3>
+              <ul class="resume-list">
+                <li><span class="resume-status current">현</span><span class="resume-role">더불어민주당 전국대학생위원회 부위원장, 조직2국장</span></li>
+                <li><span class="resume-status current">현</span><span class="resume-role">더불어민주당 대구시당 대학생위원회 수석부위원장</span></li>
+                <li><span class="resume-status current">현</span><span class="resume-role">더불어민주당 달성군지역위원회 대학생위원장</span></li>
+                <li><span class="resume-status former">전</span><span class="resume-role">더불어민주당 대구시당 청년위원회 대변인</span></li>
+              </ul>
+            </div>
+            <div class="resume-group">
+              <h3>공익 활동</h3>
+              <ul class="resume-list">
+                <li><span class="resume-status current">현</span><span class="resume-role">대구 청년단체 윤슬 대표</span></li>
+                <li><span class="resume-status current">현</span><span class="resume-role">비영리 스타트업 틈새꽃 감사</span></li>
+                <li><span class="resume-status current">현</span><span class="resume-role">청년정책연구소 유스폴랩 연구소장</span></li>
+                <li><span class="resume-status current">현</span><span class="resume-role">청년채움 이사</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="resume-col">
+            <div class="resume-group">
+              <h3>선거 이력</h3>
+              <ul class="resume-list">
+                <li><span class="resume-status former">전</span><span class="resume-role">제8회 지방선거 달성군의원(다사읍, 하빈면) 예비후보</span></li>
+                <li><span class="resume-status former">전</span><span class="resume-role">제9회 지방선거 달성군의원(다사읍, 하빈면) 예비후보</span></li>
+              </ul>
+            </div>
+            <div class="resume-group">
+              <h3>수상이력</h3>
+              <ul class="resume-list">
+                <li><span class="resume-status">2025</span><span class="resume-role">더불어민주당 당대표 1급 포상</span></li>
+                <li><span class="resume-status">2022</span><span class="resume-role">더불어민주당 대구 지방선거 청년 출마예정자 공개 오디션 1위</span></li>
+                <li><span class="resume-status">2023</span><span class="resume-role">서울특별시의회 의장 표창</span></li>
+                <li><span class="resume-status">2022</span><span class="resume-role">더불어민주당 전국청년당·전국대학생위원회 청년 지방정치 아카데미 우수 성적 수료 표창장</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- INTRO -->
@@ -385,6 +462,44 @@
           <div class="t-item"><div class="t-dot"></div><div class="t-year">2016–2019</div><div class="t-text">대구 왕선중학교 졸업</div></div>
           <div class="t-item"><div class="t-dot"></div><div class="t-year">2010–2016</div><div class="t-text">대구 매곡초등학교 졸업</div></div>
           <div class="t-item"><div class="t-dot"></div><div class="t-year">2003</div><div class="t-text">대구광역시 출생</div></div>
+        </div>
+
+        <div class="section-sub">
+          <h2>수상 이력</h2>
+          <div class="timeline">
+            <div class="t-item award"><div class="t-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5.6 6.1.6-4.6 4.1 1.3 6-5.3-3.2-5.3 3.2 1.3-6-4.6-4.1 6.1-.6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><div class="t-year">2025</div><div class="t-text">더불어민주당 당대표 1급 포상</div></div>
+            <div class="t-item award"><div class="t-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5.6 6.1.6-4.6 4.1 1.3 6-5.3-3.2-5.3 3.2 1.3-6-4.6-4.1 6.1-.6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><div class="t-year">2023</div><div class="t-text">서울특별시의회 의장 표창</div></div>
+            <div class="t-item award"><div class="t-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5.6 6.1.6-4.6 4.1 1.3 6-5.3-3.2-5.3 3.2 1.3-6-4.6-4.1 6.1-.6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><div class="t-year">2022</div><div class="t-text">더불어민주당 대구 지방선거 청년 출마예정자 공개 오디션 1위</div></div>
+            <div class="t-item award"><div class="t-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5.6 6.1.6-4.6 4.1 1.3 6-5.3-3.2-5.3 3.2 1.3-6-4.6-4.1 6.1-.6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><div class="t-year">2022</div><div class="t-text">더불어민주당 전국청년당·전국대학생위원회 청년 지방정치 아카데미 우수 성적 수료 표창장</div></div>
+          </div>
+          <div class="misc-line">그 외 저서 『새로운 시대를 위한 대한민국의 선택』을 출간했습니다.</div>
+        </div>
+
+        <div class="section-sub">
+          <h2>강동엽의 이야기</h2>
+          <div class="section-lede">이력만으로는 다 담기지 않는, 강동엽을 만든 순간들입니다.</div>
+          <div class="story-list">
+            <div class="story-item">
+              <div class="story-title">비영리(공익) 활동가</div>
+              <div class="story-text">2022년 대학 신입생 5명과 함께 비영리단체 '윤슬'을 설립해 대표를 맡았습니다. 지금까지 40여 명이 거쳐간 단체로 성장했고, '사회통합'을 비전으로 장애인을 위한 점자·음성 지원 '베리어프리 메뉴판', 어르신을 위한 '시니어 친절 메뉴판'을 지역 식당에 보급해왔습니다. 문화체육관광부 산하 기관과 함께 '어린이 예술마을 조성 사업' 공청회를 진행하는 등 노동·여성·연구 분야까지 활동을 넓혔고, 지방 청년 유출 방지 활동으로 서울특별시의회 의장 표창을 받았습니다. 시민사회에서 쌓은 경험을 바탕으로 제도권 정치에 도전하기로 결심했고, 지금은 청년정책연구소 유스폴랩과 비영리 스타트업 '틈새꽃'을 통해 공익활동을 이어가고 있습니다.</div>
+            </div>
+            <div class="story-item">
+              <div class="story-title">정치에 뜻을 갖게 된 계기</div>
+              <div class="story-text">초등학생 시절, 아버지께서 강력범죄 피해를 입고 가족이 도망치듯 이사를 해야 했습니다. 사회적 약자로서 느낀 막연한 원망과 세상에 대한 의문은 자라면서 정치적 정체성으로 이어졌고, 2011년 무상급식을 둘러싼 사회적 논쟁을 지켜보며 보편적 복지와 사회정의에 대한 생각을 다졌습니다.</div>
+            </div>
+            <div class="story-item">
+              <div class="story-title">12·3 비상계엄, 그날의 군 복무</div>
+              <div class="story-text">2024년 12월 3일 비상계엄 당일, 오분전투대기부대에서 임무를 수행하고 있었습니다.</div>
+            </div>
+            <div class="story-item">
+              <div class="story-title">희귀질환과 함께 살아온 삶</div>
+              <div class="story-text">신생아 2만 2천 명 중 1명꼴로 발견되는 희귀 유전질환 '내장역위증'을 갖고 태어났습니다. 통상 5세 이전 사망하고 5천만 명 중 1명만이 성인까지 생존하는 것으로 알려져 있습니다.</div>
+            </div>
+            <div class="story-item">
+              <div class="story-title">전국 최연소 출마 기록</div>
+              <div class="story-text">2021년 공직선거법 개정으로 피선거권 연령이 25세에서 18세로 낮아지며 예비후보로 등록해, 2022년 지방선거에서 전국 최연소(만 18세) 출마 기록을 세웠습니다. 뉴스민과 대구시당이 공동 주최한 청년 출마자 공개 오디션에서는 1위를 차지했습니다.</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -519,6 +634,10 @@
           <h2 class="detail-title" id="board-detail-title"></h2>
           <div class="detail-date" id="board-detail-meta"></div>
           <p class="detail-body" id="board-detail-body"></p>
+          <div class="detail-owner-actions" id="board-owner-actions" hidden>
+            <button class="btn-ghost" id="board-edit-btn">수정</button>
+            <button class="btn-ghost" id="board-delete-btn">삭제</button>
+          </div>
         </div>
       </div>
     </section>
@@ -526,7 +645,7 @@
     <!-- WRITE -->
     <section class="view" id="view-write" data-view="write">
       <div class="prose-wrap view-pad">
-        <h1 style="font-size:27px; margin-bottom:36px;">글쓰기</h1>
+        <h1 id="write-heading" style="font-size:27px; margin-bottom:36px;">글쓰기</h1>
         <div class="field">
           <label for="w-title">제목</label>
           <input type="text" id="w-title" placeholder="제목을 입력하세요">
@@ -819,14 +938,19 @@
 
     var boardListWrap = document.getElementById('board-list-wrap');
     var boardDetailWrap = document.getElementById('board-detail-wrap');
+    var boardOwnerActions = document.getElementById('board-owner-actions');
+    var currentDetailIndex = null;
+    var editingPostId = null;
     function openPostDetail(i) {
       var p = boardPosts[i];
       if (!p) return;
+      currentDetailIndex = i;
       document.getElementById('board-detail-title').textContent = p.title;
       document.getElementById('board-detail-meta').textContent =
         p.author + ' · ' + shortSido(p.sido) + ' ' + p.sigungu + ' · ' + p.date;
       document.getElementById('board-detail-body').textContent =
         p.content && p.content.trim() ? p.content : '작성된 내용이 없습니다.';
+      boardOwnerActions.hidden = !(myUid && p.ownerUid && p.ownerUid === myUid);
       boardListWrap.hidden = true;
       boardDetailWrap.hidden = false;
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -836,6 +960,46 @@
       boardListWrap.hidden = false;
     });
 
+    document.getElementById('board-edit-btn').addEventListener('click', function () {
+      var p = boardPosts[currentDetailIndex];
+      if (!p) return;
+      editingPostId = p.id;
+      document.getElementById('w-title').value = p.title;
+      document.getElementById('w-author').value = p.author;
+      document.getElementById('w-content').value = p.content || '';
+      sidoSelect.value = p.sido;
+      sidoSelect.dispatchEvent(new Event('change'));
+      sigunguSelect.value = p.sigungu;
+      document.getElementById('write-heading').textContent = '글 수정';
+      document.getElementById('w-submit').textContent = '수정하기';
+      showView('write');
+    });
+
+    document.getElementById('board-delete-btn').addEventListener('click', async function () {
+      var p = boardPosts[currentDetailIndex];
+      if (!p) return;
+      if (!confirm('이 글을 삭제하시겠습니까?')) return;
+      var deleteBtn = document.getElementById('board-delete-btn');
+      deleteBtn.disabled = true;
+      if (p.id && db && myUid) {
+        try {
+          await Promise.race([fsMod.deleteDoc(fsMod.doc(db, 'posts', p.id)), fsTimeout(10000)]);
+          boardDetailWrap.hidden = true;
+          boardListWrap.hidden = false;
+        } catch (e) {
+          console.error('delete failed', e);
+          alert('삭제에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        }
+      } else {
+        boardPosts = boardPosts.filter(function (bp) { return bp !== p; });
+        renderBoard();
+        renderMarkers();
+        boardDetailWrap.hidden = true;
+        boardListWrap.hidden = false;
+      }
+      deleteBtn.disabled = false;
+    });
+
     function todayStr() {
       var d = new Date();
       var mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -843,11 +1007,18 @@
       return d.getFullYear() + '.' + mm + '.' + dd;
     }
 
-    // Firestore connection — dynamic import so a blocked/failed network request
-    // only disables the shared board, never breaks the rest of the page.
+    // Firestore + anonymous auth — dynamic import so a blocked/failed network
+    // request only disables the shared board, never breaks the rest of the page.
+    // Auth identifies "this browser" (no login form), which is what lets a post's
+    // own author edit/delete it later — see the reply in chat for the caveats.
     var db = null;
     var postsCollectionRef = null;
     var fsMod = null;
+    var authMod = null;
+    var myUid = null;
+    function fsTimeout(ms) {
+      return new Promise(function (_, reject) { setTimeout(function () { reject(new Error('timeout')); }, ms); });
+    }
     var fbReady = (async function () {
       try {
         var appMod = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
@@ -865,12 +1036,22 @@
         postsCollectionRef = fsMod.collection(db, 'posts');
         var q = fsMod.query(postsCollectionRef, fsMod.orderBy('createdAt', 'desc'));
         fsMod.onSnapshot(q, function (snapshot) {
-          boardPosts = snapshot.docs.map(function (d) { return d.data(); });
+          boardPosts = snapshot.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
           renderBoard();
           renderMarkers();
         }, function (err) {
           console.error('Firestore listen failed', err);
         });
+
+        try {
+          authMod = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js');
+          var auth = authMod.getAuth(fbApp);
+          var cred = await authMod.signInAnonymously(auth);
+          myUid = cred.user.uid;
+        } catch (authErr) {
+          console.warn('Anonymous auth unavailable — writing/editing/deleting posts is disabled', authErr);
+        }
+
         return true;
       } catch (e) {
         console.warn('Firestore unavailable — board will not sync across visitors', e);
@@ -878,8 +1059,19 @@
       }
     })();
 
-    document.getElementById('go-write').addEventListener('click', function () { showView('write'); });
-    document.getElementById('w-cancel').addEventListener('click', function () { resetWriteForm(); showView('board'); });
+    document.getElementById('go-write').addEventListener('click', function () {
+      editingPostId = null;
+      document.getElementById('write-heading').textContent = '글쓰기';
+      document.getElementById('w-submit').textContent = '등록하기';
+      showView('write');
+    });
+    document.getElementById('w-cancel').addEventListener('click', function () {
+      resetWriteForm();
+      editingPostId = null;
+      document.getElementById('write-heading').textContent = '글쓰기';
+      document.getElementById('w-submit').textContent = '등록하기';
+      showView('board');
+    });
 
     var attachOn = false;
     var attachBtn = document.getElementById('w-attach');
@@ -917,38 +1109,79 @@
       }
       var content = document.getElementById('w-content').value.trim();
       var coords = KOREA_REGIONS[sido][sigungu];
-      var postData = {
-        title: title, author: author, content: content, sido: sido, sigungu: sigungu,
-        lat: coords[0], lng: coords[1], date: todayStr()
-      };
+      var isEdit = !!editingPostId;
+      var busyLabel = isEdit ? '수정 중…' : '등록 중…';
+      var doneLabel = isEdit ? '수정하기' : '등록하기';
 
       submitBtn.disabled = true;
-      submitBtn.textContent = '등록 중…';
+      submitBtn.textContent = busyLabel;
       var connected = await fbReady;
-      if (connected && postsCollectionRef) {
-        try {
-          postData.createdAt = fsMod.serverTimestamp();
-          await Promise.race([
-            fsMod.addDoc(postsCollectionRef, postData),
-            new Promise(function (_, reject) { setTimeout(function () { reject(new Error('timeout')); }, 10000); })
-          ]);
-          resetWriteForm();
-          showView('board');
-        } catch (e) {
-          console.error('Failed to save post', e);
-          hint.textContent = '게시글 등록에 실패했습니다. 잠시 후 다시 시도해주세요.';
-          hint.classList.add('show');
+
+      if (!connected || !postsCollectionRef) {
+        // No shared backend reachable (e.g. offline, or the sandboxed artifact
+        // preview) — keep working for this browser tab only, as a fallback.
+        if (isEdit) {
+          var idx = boardPosts.findIndex(function (p) { return p.id === editingPostId; });
+          if (idx !== -1) {
+            boardPosts[idx] = Object.assign({}, boardPosts[idx], {
+              title: title, author: author, content: content, sido: sido, sigungu: sigungu,
+              lat: coords[0], lng: coords[1]
+            });
+          }
+        } else {
+          boardPosts.unshift({
+            id: 'local-' + Date.now(), ownerUid: 'local',
+            title: title, author: author, content: content, sido: sido, sigungu: sigungu,
+            lat: coords[0], lng: coords[1], date: todayStr()
+          });
         }
-      } else {
-        // No shared backend reachable — keep working for this browser only.
-        boardPosts.unshift(postData);
         renderBoard();
         renderMarkers();
         resetWriteForm();
+        editingPostId = null;
         showView('board');
+        submitBtn.disabled = false;
+        submitBtn.textContent = doneLabel;
+        return;
+      }
+
+      if (!myUid) {
+        hint.textContent = '지금은 글쓰기가 어렵습니다. 잠시 후 다시 시도해주세요.';
+        hint.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = doneLabel;
+        return;
+      }
+
+      try {
+        if (isEdit) {
+          var docRef = fsMod.doc(db, 'posts', editingPostId);
+          await Promise.race([
+            fsMod.updateDoc(docRef, {
+              title: title, author: author, content: content, sido: sido, sigungu: sigungu,
+              lat: coords[0], lng: coords[1]
+            }),
+            fsTimeout(10000)
+          ]);
+        } else {
+          var postData = {
+            title: title, author: author, content: content, sido: sido, sigungu: sigungu,
+            lat: coords[0], lng: coords[1], date: todayStr(),
+            ownerUid: myUid, createdAt: fsMod.serverTimestamp()
+          };
+          await Promise.race([fsMod.addDoc(postsCollectionRef, postData), fsTimeout(10000)]);
+        }
+        resetWriteForm();
+        editingPostId = null;
+        document.getElementById('write-heading').textContent = '글쓰기';
+        showView('board');
+      } catch (e) {
+        console.error('Failed to save post', e);
+        hint.textContent = (isEdit ? '수정' : '등록') + '에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        hint.classList.add('show');
       }
       submitBtn.disabled = false;
-      submitBtn.textContent = '등록하기';
+      submitBtn.textContent = doneLabel;
     });
 
     renderBoard();
