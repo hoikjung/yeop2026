@@ -6,8 +6,6 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
   :root {
@@ -150,6 +148,10 @@
   .slogan-chip .q { font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 16.5px; line-height: 1.4; color: var(--ink); margin-bottom: 6px; }
   .slogan-chip .d { font-size: 12.5px; line-height: 1.6; color: var(--ink-muted); }
 
+  /* Declaration speech, appended below the intro bio */
+  .declaration { max-width: 740px; margin: 88px auto 0; }
+  .declaration-title { font-size: 22px; margin-bottom: 28px; }
+
   /* Career story — chaptered narrative with photo rows */
   .story-open { font-family: 'Noto Serif KR', serif; font-style: italic; font-weight: 700; font-size: 19px; color: var(--navy); margin: 0 0 56px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
   .story-chapter { margin-top: 72px; }
@@ -171,9 +173,10 @@
   .focus-title { font-size: 17.5px; font-weight: 800; margin-bottom: 10px; }
   .focus-desc { font-size: 14.5px; line-height: 1.75; color: var(--ink-muted); max-width: 62ch; }
   .focus-sub { list-style: none; margin: 16px 0 0; padding: 0; max-width: 62ch; }
-  .focus-sub li { position: relative; padding-left: 16px; font-size: 13.5px; line-height: 1.7; color: var(--ink); margin-bottom: 8px; }
-  .focus-sub li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--navy); }
+  .focus-sub li { font-size: 13.5px; line-height: 1.7; color: var(--ink); margin-bottom: 10px; }
   .focus-sub li:last-child { margin-bottom: 0; }
+  .focus-sub li .fs-code { font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; margin-right: 7px; }
+  .focus-sub li .fs-note { display: block; margin: 4px 0 0; color: var(--ink-muted); font-size: 12.5px; line-height: 1.6; }
 
   /* Media */
   .media-sub { color: var(--ink-muted); font-size: 15px; margin-bottom: 40px; }
@@ -187,73 +190,6 @@
   .press-card:hover .press-cta { color: var(--navy); }
   .press-thumb.placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(120% 140% at 25% 20%, var(--navy-deep), var(--navy) 70%); }
   .press-thumb.placeholder .placeholder-label { color: #fff; font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
-
-  /* Board */
-  .board-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
-  .board-sub { color: var(--ink-muted); font-size: 15px; }
-  .board-layout { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
-  .board-map-wrap { position: sticky; top: 88px; }
-  .board-map { width: 100%; height: 280px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper-soft); font-family: 'Noto Sans KR', sans-serif; }
-  .board-map .leaflet-popup-content-wrapper { border-radius: 6px; }
-  .board-map .leaflet-popup-content { font-size: 12.5px; line-height: 1.6; margin: 10px 12px; }
-  .board-map .popup-title { font-weight: 700; color: var(--ink); margin-bottom: 2px; }
-  .board-map .popup-meta { color: var(--ink-muted); }
-  .board-empty { padding: 44px 8px; text-align: center; color: var(--ink-muted); font-size: 14px; border-bottom: 1px solid var(--line); }
-  .board-map-fallback { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--ink-muted); font-size: 13px; text-align: center; padding: 0 24px; line-height: 1.6; }
-  .btn-primary {
-    height: 42px; padding: 0 20px; border-radius: 3px; border: none;
-    background: var(--navy); color: #fff; font-size: 13.5px; font-weight: 700;
-  }
-  .btn-ghost {
-    height: 42px; padding: 0 20px; border-radius: 3px; border: 1px solid var(--line);
-    background: var(--paper); color: var(--ink); font-size: 13.5px; font-weight: 600;
-  }
-  .detail-owner-actions { display: flex; gap: 10px; margin-top: 32px; }
-  .detail-owner-actions .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
-  .board-list { border-top: 2px solid var(--ink); font-variant-numeric: tabular-nums; }
-  .board-row {
-    display: flex; align-items: center; gap: 14px; width: 100%;
-    padding: 17px 4px; border: none; border-bottom: 1px solid var(--line);
-    background: none; text-align: left; cursor: pointer; font-family: inherit;
-  }
-  .board-row-no { flex: 0 0 auto; width: 24px; color: var(--ink-muted); font-size: 13px; }
-  .board-row-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-  .board-row-title { display: block; font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); }
-  .board-row-meta { display: block; font-size: 12.5px; color: var(--ink-muted); }
-  .board-row-chevron { flex: 0 0 auto; color: var(--line); display: flex; }
-  .board-row:hover .board-row-title { color: var(--navy); }
-  .board-row:hover .board-row-chevron { color: var(--navy); }
-
-  /* Write form */
-  .field { margin-bottom: 20px; }
-  .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-  .field-row { display: flex; gap: 10px; }
-  .field-row .field { flex: 1 1 0; margin-bottom: 0; }
-  .field input[type="text"] {
-    width: 100%; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 3px;
-    font-size: 14px; color: var(--ink); background: var(--paper); outline: none;
-  }
-  .field select {
-    width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 3px;
-    font-size: 14px; color: var(--ink); background: var(--paper); outline: none;
-    -webkit-appearance: none; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%235b6472' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
-  }
-  .field select:disabled { color: var(--ink-muted); background-color: var(--paper-soft); }
-  .field textarea {
-    width: 100%; height: 200px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 3px;
-    font-size: 14px; color: var(--ink); background: var(--paper); outline: none; resize: vertical; line-height: 1.7;
-  }
-  .attach-btn {
-    display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px;
-    border-radius: 3px; border: 1px solid var(--line); background: var(--paper); color: var(--ink);
-    font-size: 13px; font-weight: 600;
-  }
-  .attach-btn.on { border-color: var(--navy); background: var(--navy-tint); color: var(--navy); }
-  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 28px; }
-  .form-hint { font-size: 12.5px; color: var(--danger); margin-top: 8px; display: none; }
-  .form-hint.show { display: block; }
 
   footer {
     border-top: 1px solid var(--line); padding: 28px clamp(20px, 4vw, 44px);
@@ -270,11 +206,6 @@
     .slogan-row { flex-direction: column; gap: 20px; }
     .press-grid { grid-template-columns: 1fr; gap: 28px; }
     .focus-item { grid-template-columns: 1fr; gap: 6px; }
-    .board-layout { grid-template-columns: 1fr; }
-    .board-map-wrap { position: static; order: -1; margin-bottom: 8px; }
-    .board-map { height: 220px; }
-    .field-row { flex-direction: column; gap: 20px; }
-    .board-row { padding: 15px 2px; }
     .photo-row img { height: 168px; }
   }
 
@@ -402,7 +333,6 @@
       <li><button data-nav="policy">정책공약</button></li>
       <li><button data-nav="media">미디어</button></li>
       <li><button data-nav="quiz">동BTI</button></li>
-      <li><button data-nav="board">응원·제안</button></li>
     </ul>
   </header>
 
@@ -456,6 +386,35 @@
               <div class="slogan-chip"><div class="q">사회통합 공익활동가</div><div class="d">비영리단체 '윤슬' 대표. 지역 사회와 함께해온 공익 활동가입니다.</div></div>
               <div class="slogan-chip"><div class="q">진짜 대학생 후보</div><div class="d">지방, 20대 남성, 대학생. 당 안팎 보통 대학생의 목소리를 대표하겠습니다.</div></div>
             </div>
+          </div>
+        </div>
+
+        <div class="declaration">
+          <div class="kicker"><span class="kicker-tag">DECLARATION</span><span class="kicker-num">CH. 01</span><span class="kicker-rule"></span></div>
+          <h2 class="declaration-title">출마선언문</h2>
+          <div class="intro-body">
+            <p>안녕하십니까.<br>대구 달성군 대학생위원장, 영남대 정치외교학과 3학년 강동엽입니다.<br>20대 지지율 회복과, 전국정당의 소명을 안고<br>더불어민주당 전국대학생위원장에 출마합니다.</p>
+            <p>2021년 당에 발을 들여, 두 번의 지방선거에 도전했습니다.<br>“20대가 민주당을 지지할 이유가 뭐냐!”<br>이렇게 말하는 대다수의 20대 유권자를 설득할 때가 단연 기억에 남습니다.</p>
+            <p>“국민의힘은 중앙대학생위원회. 우리 민주당은 전국대학생위원회입니다.”<br>여의도 ‘중앙’ 권력을 향해 줄 서는 수직적 하부조직이 아니라<br>‘전국’ 각지의 청년들이 수평적으로 모여 자치분권을 실천하는 정당.<br>대학생의 목소리를 제도권으로 가장 잘 전달할 시스템을 갖춘 정당이라 외쳐왔습니다.</p>
+            <p>하지만 현시점, 우리는 스스로에게 뼈아프게 물어야 합니다.<br>민주당, ‘전국대학생위원회’라는 이름에 정말 떳떳합니까.<br>의미와 의지에 그쳐선 안 됩니다. 실천하고 현실로 만듭시다.<br>“모두의 대학위”를 만들겠습니다.</p>
+            <p>하루하루 생계와 학업을 이어가는 대다수 20대들의 삶을 대표해야 합니다.<br>아무 대가 없이 헌신하는 대학생 당원들과 함께 서야 합니다.<br>이들의 노고와 용기를 가장 잘 아는 사람.<br>바로 저 강동엽입니다.</p>
+            <p>동시에 우리도 청년 민심에서 동떨어진 환경에서 활동하는 것은 아닌지 스스로에게 물어봐야 합니다. “본인들의 세계관 바깥을 볼 줄 알았으면 합니다”<br>경남, 부산의 한 20대 당원이 2030타운홀 미팅 때 한 이야기입니다.</p>
+            <p>20대 지지율이 심상치 않습니다.<br>우리 당의 20대 조직과 청년기구도 지지율 하락의 책임으로부터 100% 자유로울 수 없습니다.<br>발전적 대안과 쇄신이 필요합니다.<br>20대 신뢰 회복을 위해 당내 청년기구의 역할이 그 어느 때보다 중요한 시점입니다.</p>
+            <p>지난 지방선거 당시, 저는 김부겸 대구시장 후보 캠프 청년본부 정무특보를 맡았습니다.<br>대구의 20대는 김부겸 후보에게 각각 남성 33.2%, 여성 53.7%.<br>4년 전에 비해 두 배 가까이 늘어난 지지를 보여줬습니다.<br>이는 서울의 20대 남녀보다 각각 12.6% p, 5.2% p 높은 수치입니다. 가장 견고했고 관성적인 보수 지지를 펼쳤던 20대의 마음을 돌려봤습니다.</p>
+            <p>오늘날의 청년 세대는 특정 이념에 맹목적으로 충성하지 않습니다.<br>2030 세대가 극우화되었다는 절망 섞인 탄식은 이제 거둬야 합니다.<br>청년들은 이미 실용이라는 명확하고 새로운 잣대를 들고 정치를 평가하고 있습니다.<br>이제, 이러한 세대 감수성에 부합한 대중적 소구력을 갖춘 인물이 대학위에 필요합니다.</p>
+            <p>1020 세대의 지지는 되찾아오는 것이 아닙니다.<br>다수의 1020 세대는 그 어느 정당에도 지지를 표한 적이 없습니다.<br>1020의 지지를 찾읍시다. 찾아 나섭시다.</p>
+            <p>공정하게 열고, 전국으로 넓히며, 실력으로 키우겠습니다.</p>
+            <p>첫 번째, 열린 기회, 모두의 대학위를 만들겠습니다.<br>수석부위원장 및 국장단(집행부) 일부를 공개 모집하고, 구성을 공개하겠습니다.<br>중앙위원과 부위원장, 대의원 추천 프로세스를 개혁하겠습니다.<br>운영위원을 내실화하고, 감사위원, 민심 옵저버 등 명확한 역할을 부여하겠습니다.<br>더 나아가 청소년 당원의 명시적 권리를 보장하고, 장애학생과 대학 미진학 인원들도 함께할 수 있는 확장성을 갖추겠습니다. 12만 20대 당원들의 대표를 고작 400여 명의 선거인단이 선출할 수밖에 없게 만드는 폐쇄적 선거 구조도 바꿔보겠습니다.</p>
+            <p>둘째, 닿는 현장, 커지는 대학위를 만들겠습니다.<br>지방 시대에 발맞춰 5극 3특 연석회의를 신설 및 운영하겠습니다.<br>청년세대의 획일화된 시대정신이 없다면, 분산된 현안을 찾으러 나서야 합니다.<br>각 권역별 의제와 정책을 개발하고, 총학생회 및 대학가 구성원 등 이해관계 당사자들을 참여주체로 삼겠습니다. 동시에 각 시도당 대학위 발대식 행사와 발맞춰 원스톱 업무를 지원하겠습니다. 중앙당 사업비 지원 또한 추진하겠습니다.<br>이 과정 속에 평당원을 발굴하고, 캠퍼스지부와 지역 대학위를 활성화하겠습니다.<br>이렇듯 발굴된 지역의 현안과 세대의 의제들은 청년미래연석회의를 통해 당 지도부에 명확히 전달하겠습니다. 별도로 종합 총회를 정책·의제 페스타 형태로 개최해, 수상 시 해외 정당 교류 프로그램 제공 기회 또한 확대 추진하겠습니다.</p>
+            <p>셋째, 2028 총선 승리, 우리의 대학위가 만들겠습니다.<br>가칭 ‘미래 정치아카데미’를 열겠습니다.<br>커리큘럼에 대학위 출신 보좌진, 정책 전문가, 정당 실무진을 배치하겠습니다.<br>정책 의제부터 선거 실무에 이르는 과정을 함께 학습하고, 28년 총선 입후보 희망자와 수강생 간 매칭도 추진할 것입니다. 오디션, 드래프트, 업무협약 등 다양한 방식을 고려하겠습니다. 이를 통해 28년 총선에 반드시 필요한 정책과 인재를 발굴하겠습니다.<br>더 나아가 민주당의 유능한 미래 일꾼들을 양성하겠습니다.<br>우리는 미래와 대안을 이야기할 때 빛났고,<br>네거티브와 줄 서기에 연연할 때 후퇴했습니다.<br>저 강동엽, 대학생위원회의 떳떳한 역사를 이어 달리겠습니다.<br>우리 안팎의 낡음을 타파하고 당의 발전을 주도하겠습니다.</p>
+            <p>대학생 당원 동지 여러분.<br>20대. 남성. 영남.<br>그 무엇 하나 민주당스럽지 않은 정체성을 갖고 싸워왔습니다.<br>이제는 지역뿐만이 아닌 세대와 여러분을 대변하고 싶습니다.</p>
+            <p>기존 이해관계, 기성 정치 눈치 보며 소신을 꺾지 않겠습니다.<br>그러나 당과 불협화음을 넘어 소음까지 내선 안 됩니다.<br>정당의 존재 목적인 정권 획득과 선거 승리를 위해,<br>지지율 회복을 목표로 최선을 다하겠습니다.<br>잡음을 최소화하되, 대학생위원회가 당의 자성 조직으로 기능함으로써<br>20대 지지를 끄집어내는 것입니다.</p>
+            <p>여러 정쟁에서의 동의/부동의 여부를 밝히는 수준에 그치는 것이 아니라,<br>청년들의 대안을 제시해 인정받는 유능한 전대위를 만들겠습니다.<br>현실감각을 일깨우고 지역에서 구른 20대 후보가,<br>학술적 논의와 탁상행정에 균형을 제공하고 의견을 낼 수 있게 해주십시오.</p>
+            <p>20대 친구들은 한껏 꿈을 꾸다가도 쉽게 포기합니다.<br>하고 싶은 일 하겠다고 서울 단칸방에 비싼 월세, 생활비 내면<br>평생 일해도 내 집 하나 못 살 것 같답니다.<br>지방에서 캥거루족하고 구축 아파트 하나 대출로 사는 편이 낫겠답니다.<br>이 패배주의가 팽배한 우리 세대의 절망감을 어찌합니까.</p>
+            <p>좋은 일자리가 없어서 고향을 떠나야 하는 마음,<br>반면 평생 일해도 집 하나 제대로 못 구할 것 같은 마음,<br>경쟁에서 나만 뒤처지는 것 같은 마음,<br>기성 정치권으로부터 무시당하는 것 같은 마음,<br>저 당 싫어서 이 당에 투표하는 마음,</p>
+            <p>그 마음들과 함께하겠습니다.<br>여러분과 함께, 바꾸고 싶습니다.</p>
+            <p>참여 문턱을 낮추고 권한과 책임을 동시에 강화하겠습니다.<br>청년의 문제에 함께 마음 쓰는 민주당.<br>어른의 문제에 함께 고민하는 대학생위원회.<br>모두가 책임지는 민주당이 필요합니다.<br>당의 정체성을 잇겠습니다.<br>노무현의 사람 사는 세상, 김대중의 행동하는 양심.<br>대한민국 민주주의와 포용성장을 이끌어온 우리 당의 가치를 바로 세우겠습니다.<br>제가 주인공이 되는 것이 아닌, 주인공들을 데려올 창구와 구조를 만들겠습니다.<br>대학생 당원 동지 여러분, 함께 민주당의 미래를 열어갑시다.<br>우리가 앞장서서 당의 혁신을 주도합시다.</p>
+            <p>동반성장, 모두의 대학위!<br>지금부터 시작합니다.<br>감사합니다.</p>
           </div>
         </div>
       </div>
@@ -524,37 +483,37 @@
           <div class="focus-item">
             <div class="focus-num">01</div>
             <div>
-              <div class="focus-title">열린 대학생위원회</div>
-              <div class="focus-desc">모두가 참여할 수 있는 투명한 거버넌스를 만들겠습니다. 필요한 권한은 확대하고, 확대된 권한에는 책임을 부여하겠습니다.</div>
+              <div class="focus-title">열린 기회, 모두의 대학위!</div>
               <ul class="focus-sub">
-                <li>중앙위원, 사무처 집행부 공개모집 및 선출</li>
-                <li>운영위원 실재화 및 집행부 국원 선임·활성화</li>
-                <li>대의원 선정 투명화</li>
+                <li><span class="fs-code">3-1</span>수석부위원장 및 국장단(집행부) 일부 공개 모집, 구성 공개</li>
+                <li><span class="fs-code">3-2</span>중앙위원 및 부위원장 추천 개혁</li>
+                <li><span class="fs-code">3-3</span>운영위원 내실화 및 역할 부여 (감사위원회, 민심 옵저버 등)</li>
               </ul>
             </div>
           </div>
           <div class="focus-item">
             <div class="focus-num">02</div>
             <div>
-              <div class="focus-title">풀뿌리 대학생위원회</div>
-              <div class="focus-desc">지역, 캠퍼스, 골목에서 함께 활동하며 성과를 만들어 나가겠습니다. 고군분투하는 당원들과 함께하겠습니다.</div>
+              <div class="focus-title">닿는 현장, 커지는 대학위!</div>
               <ul class="focus-sub">
-                <li>5극3특 권역별 연석회의(가칭) 정식 기구 설립 및 시도당 대학위별 지원책 마련</li>
-                <li>캠퍼스지부 명문화(규정 정비 및 공식 조직화)</li>
-                <li>사각지대 없이, 평당원과 함께하는 전대위</li>
+                <li><span class="fs-code">4-1</span>5극3특 연석회의 신설 및 추진</li>
+                <li><span class="fs-code">4-2</span>각 권역별 의제(정책) 개발, 대학가 구성원 및 총학생회 등 이해관계당사자 폭넓게 배석 추진<span class="fs-note">각 시도당 대학위 발대식 시즌과 결합해 원스톱 업무 지원, 중앙당 사업비 지원 추진</span></li>
+                <li><span class="fs-code">4-3</span>평당원 발굴 / 캠퍼스 크루 결합</li>
+                <li><span class="fs-code">4-4</span>캠퍼스 지부 / 지역위 대학위 활성화</li>
+                <li><span class="fs-code">4-5</span>이후 발굴 현안 및 의제 청년미래연석회의 전달. 별도로 종합 총회(성과보고회) 정책(의제) 페스타 형식 개최. 수상 팀 해외정당 교류 프로그램 제공.</li>
               </ul>
             </div>
           </div>
           <div class="focus-item">
             <div class="focus-num">03</div>
             <div>
-              <div class="focus-title">성장하는 대학생위원회</div>
-              <div class="focus-desc">실력 있는 청년정치를 만들겠습니다. 느슨해진 여의도 정치에 긴장감을 불어넣겠습니다.</div>
+              <div class="focus-title">2028 주역, 우리의 대학위!</div>
               <ul class="focus-sub">
-                <li>공개 오디션 개최(정책 발표회, 이슈 토론회)</li>
-                <li>인턴십 강화(국회·지방의회·당 청년국 실무 경험 확대)</li>
-                <li>비전2030: 2년간 3개 위원회를 통한 2028년 총선 어젠더 발굴 및 숙의</li>
-                <li>원내정당 전대위 간 교류 활성화(정례 토론회, 청년 현안 공동 대응)</li>
+                <li><span class="fs-code">5-1</span>28년 총선 대비 미래정치아카데미(가칭) 개설</li>
+                <li><span class="fs-code">5-2</span>강의 프로세스에 대학위 출신 전현직 비서관, 총선 후보자 및 캠프 근무 이력자 배치</li>
+                <li><span class="fs-code">5-3</span>총선 캠프 근무 희망자, 국회 보좌진 희망자, 향후 공직선거 출마자 등 폭넓은 수강 대상 선정</li>
+                <li><span class="fs-code">5-4</span>프로그램 막판 28년 총선 입후보 희망자 ↔ 수강생 간 매칭 추진. 오디션, 드래프트, 업무협약 등 다양한 방식 고려</li>
+                <li><span class="fs-code">5-5</span>28년 총선 입후보 또는 캠프 선거운동원 기용 계약 → 추후 의원실(보좌진) 진출 경로 안내 제공까지 연계</li>
               </ul>
             </div>
           </div>
@@ -852,81 +811,6 @@
 })();
 </script>
 
-    <!-- BOARD -->
-    <section class="view" id="view-board" data-view="board">
-      <div class="wrap view-pad">
-        <div id="board-list-wrap">
-          <div class="board-head">
-            <div>
-              <h1 style="font-size:27px;">응원·제안</h1>
-              <div class="board-sub" style="margin-top:8px;">자유롭게 의견을 남겨주세요</div>
-            </div>
-            <button class="btn-primary" id="go-write">글쓰기</button>
-          </div>
-          <div class="board-layout">
-            <div class="board-list" id="board-body"></div>
-            <div class="board-map-wrap">
-              <div class="board-map" id="board-map"><div class="board-map-fallback">지도를 불러올 수 없습니다.<br>실제 배포된 사이트에서 확인해주세요.</div></div>
-            </div>
-          </div>
-        </div>
-        <div id="board-detail-wrap" hidden>
-          <button class="back-link" id="board-back">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            목록으로
-          </button>
-          <h2 class="detail-title" id="board-detail-title"></h2>
-          <div class="detail-date" id="board-detail-meta"></div>
-          <p class="detail-body" id="board-detail-body"></p>
-          <div class="detail-owner-actions" id="board-owner-actions" hidden>
-            <button class="btn-ghost" id="board-edit-btn">수정</button>
-            <button class="btn-ghost" id="board-delete-btn">삭제</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- WRITE -->
-    <section class="view" id="view-write" data-view="write">
-      <div class="prose-wrap view-pad">
-        <h1 id="write-heading" style="font-size:27px; margin-bottom:36px;">글쓰기</h1>
-        <div class="field">
-          <label for="w-title">제목</label>
-          <input type="text" id="w-title" placeholder="제목을 입력하세요">
-        </div>
-        <div class="field">
-          <label for="w-author">작성자</label>
-          <input type="text" id="w-author" placeholder="이름을 입력하세요">
-        </div>
-        <div class="field">
-          <label>위치</label>
-          <div class="field-row">
-            <div class="field">
-              <select id="w-sido"><option value="">시/도 선택</option></select>
-            </div>
-            <div class="field">
-              <select id="w-sigungu" disabled><option value="">시/군/구 선택</option></select>
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label>사진 첨부</label>
-          <button class="attach-btn" id="w-attach" type="button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M8 12l6.5-6.5a3 3 0 114.24 4.24L11.5 17a5 5 0 11-7.07-7.07L12 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span id="w-attach-label">사진 선택</span>
-          </button>
-        </div>
-        <div class="field">
-          <label for="w-content">내용</label>
-          <textarea id="w-content" placeholder="응원 또는 제안 내용을 자유롭게 작성해주세요"></textarea>
-          <div class="form-hint" id="w-hint">제목, 작성자, 위치(시/도·시/군/구)를 입력해주세요.</div>
-        </div>
-        <div class="form-actions">
-          <button class="btn-ghost" id="w-cancel">취소</button>
-          <button class="btn-primary" id="w-submit">등록하기</button>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>© 2026 강동엽 캠프 · 더불어민주당 전국대학생위원장 후보 · 달성군의원 예비후보(다사·하빈)<br>010-6671-5014 · dalseongyeop@naver.com</footer>
@@ -940,495 +824,17 @@
     function showView(name) {
       views.forEach(function (v) { v.classList.toggle('active', v.dataset.view === name); });
       navButtons.forEach(function (b) {
-        var maps = (b.dataset.nav === 'media' && name === 'media') || (b.dataset.nav === 'board' && (name === 'board' || name === 'write'));
+        var maps = (b.dataset.nav === 'media' && name === 'media');
         if (b.dataset.nav === name || maps) b.setAttribute('aria-current', 'page');
         else b.removeAttribute('aria-current');
       });
       window.scrollTo({ top: 0, behavior: 'auto' });
-      if (name === 'board' && boardMap) {
-        setTimeout(function () { boardMap.invalidateSize(); }, 0);
-      }
     }
     navButtons.forEach(function (b) {
       b.addEventListener('click', function () {
-        if (boardListWrap && boardDetailWrap) { boardDetailWrap.hidden = true; boardListWrap.hidden = false; }
         showView(b.dataset.nav);
       });
     });
-
-    // Location data (시/도 -> 시/군/구 -> [lat, lng])
-    var KOREA_REGIONS = {
-      "서울특별시": {
-        "강남구": [37.4951, 127.06278], "강동구": [37.55274, 127.14546], "강북구": [37.6349, 127.02015],
-        "강서구": [37.56227, 126.81622], "관악구": [37.47876, 126.95235], "광진구": [37.53913, 127.08366],
-        "구로구": [37.49447, 126.8502], "금천구": [37.47486, 126.89106], "노원구": [37.66045, 127.06718],
-        "도봉구": [37.65066, 127.03011], "동대문구": [37.58189, 127.05408], "동작구": [37.50056, 126.95149],
-        "마포구": [37.55438, 126.90926], "서대문구": [37.57809, 126.93635], "서초구": [37.4809, 127.0328],
-        "성동구": [37.55107, 127.04146], "성북구": [37.59268, 127.01682], "송파구": [37.5052, 127.11294],
-        "양천구": [37.52643, 126.86529], "영등포구": [37.52527, 126.90144], "용산구": [37.53155, 126.98055],
-        "은평구": [37.60272, 126.92639], "종로구": [37.5921, 126.97934], "중구": [37.5636, 126.99756],
-        "중랑구": [37.60618, 127.09256]
-      },
-      "부산광역시": {
-        "강서구": [35.14956, 128.98014], "금정구": [35.24263, 129.09228], "기장군": [35.24421, 129.21847],
-        "남구": [35.13674, 129.08373], "동구": [35.13023, 129.04544], "동래구": [35.19951, 129.08536],
-        "부산진구": [35.15949, 129.05282], "북구": [35.19974, 128.9906], "사상구": [35.14898, 128.98988],
-        "사하구": [35.10442, 128.97441], "서구": [35.09742, 129.02405], "수영구": [35.14456, 129.11305],
-        "연제구": [35.17618, 129.07964], "영도구": [35.09115, 129.06792], "중구": [35.10621, 129.03217],
-        "해운대구": [35.16315, 129.16354]
-      },
-      "대구광역시": {
-        "남구": [35.84605, 128.5798], "달서구": [35.82964, 128.53243], "달성군": [35.77467, 128.42955],
-        "동구": [35.88687, 128.63548], "북구": [35.88582, 128.5828], "서구": [35.87181, 128.55917],
-        "수성구": [35.85825, 128.63067], "중구": [35.86927, 128.60633]
-      },
-      "인천광역시": {
-        "강화군": [37.7466, 126.48489], "계양구": [37.53745, 126.7379], "남동구": [37.44693, 126.73137],
-        "동구": [37.47367, 126.64335], "미추홀구": [37.4634, 126.65083], "부평구": [37.50699, 126.72159],
-        "서구": [37.54561, 126.67582], "연수구": [37.41031, 126.67862], "옹진군": [37.44614, 126.63722],
-        "중구": [37.46421, 126.63074]
-      },
-      "광주광역시": {
-        "광산구": [35.13938, 126.79345], "남구": [35.13245, 126.90212], "동구": [35.14615, 126.9316],
-        "북구": [35.17441, 126.91191], "서구": [35.15195, 126.88962]
-      },
-      "대전광역시": {
-        "대덕구": [36.34719, 127.41577], "동구": [36.31174, 127.4548], "서구": [36.35545, 127.38333],
-        "유성구": [36.36219, 127.35634], "중구": [36.32552, 127.4214]
-      },
-      "울산광역시": {
-        "남구": [35.54393, 129.33018], "동구": [35.50472, 129.41637], "북구": [35.58244, 129.36116],
-        "울주군": [35.56233, 129.1269], "중구": [35.56937, 129.31111]
-      },
-      "세종특별자치시": {
-        "세종특별자치시": [36.48, 127.289]
-      },
-      "경기도": {
-        "가평군": [37.83109, 127.5097], "고양시": [37.65845, 126.832], "과천시": [37.42917, 126.98747],
-        "광명시": [37.4784, 126.86466], "광주시": [37.40967, 127.25508], "구리시": [37.5943, 127.13943],
-        "군포시": [37.35894, 126.93513], "김포시": [37.6153, 126.71576], "남양주시": [37.63615, 127.21654],
-        "동두천시": [37.90277, 127.05903], "부천시": [37.50389, 126.7661], "성남시": [37.42, 127.12652],
-        "수원시": [37.26333, 127.02867], "시흥시": [37.38, 126.80278], "안산시": [37.31972, 126.83028],
-        "안성시": [37.00806, 127.27972], "안양시": [37.39472, 126.95694], "양주시": [37.7854, 127.04588],
-        "양평군": [37.4914, 127.4874], "여주시": [37.29806, 127.6375], "연천군": [38.0966, 127.0748],
-        "오산시": [37.15367, 127.07751], "용인시": [37.24111, 127.17750], "의왕시": [37.34472, 126.96833],
-        "의정부시": [37.73778, 127.03444], "이천시": [37.27222, 127.435], "파주시": [37.7602, 126.7799],
-        "평택시": [36.99222, 127.11278], "포천시": [37.89467, 127.20017], "하남시": [37.53944, 127.21472],
-        "화성시": [37.19944, 126.83139]
-      },
-      "강원도": {
-        "강릉시": [37.75194, 128.87639], "고성군": [38.3806, 128.4678], "동해시": [37.52472, 129.11417],
-        "삼척시": [37.44639, 129.16528], "속초시": [38.20694, 128.59139], "양구군": [38.1096, 127.9898],
-        "양양군": [38.0754, 128.6191], "영월군": [37.1836, 128.4617], "원주시": [37.34222, 127.92028],
-        "인제군": [38.0696, 128.17], "정선군": [37.3805, 128.6608], "철원군": [38.1466, 127.3132],
-        "춘천시": [37.88139, 127.72972], "태백시": [37.16444, 128.985], "평창군": [37.3705, 128.3906],
-        "홍천군": [37.6971, 127.8887], "화천군": [38.1063, 127.7083], "횡성군": [37.4916, 128.0473]
-      },
-      "충청북도": {
-        "괴산군": [36.815, 127.7867], "단양군": [36.9846, 128.3656], "보은군": [36.4894, 127.7295],
-        "영동군": [36.1751, 127.7838], "옥천군": [36.3062, 127.5716], "음성군": [36.9403, 127.6902],
-        "제천시": [37.13139, 128.19083], "증평군": [36.7855, 127.5813], "진천군": [36.8556, 127.4358],
-        "청주시": [36.64222, 127.48972], "충주시": [36.99083, 127.92583]
-      },
-      "충청남도": {
-        "계룡시": [36.2745, 127.2487], "공주시": [36.44667, 127.11889], "금산군": [36.1088, 127.4881],
-        "논산시": [36.18694, 127.09861], "당진시": [36.8896, 126.6459], "보령시": [36.33333, 126.61278],
-        "부여군": [36.2758, 126.9096], "서산시": [36.78472, 126.45028], "서천군": [36.0803, 126.6919],
-        "아산시": [36.78972, 127.00278], "예산군": [36.6812, 126.845], "천안시": [36.815, 127.11389],
-        "청양군": [36.4592, 126.8022], "태안군": [36.7452, 126.2977], "홍성군": [36.6014, 126.6608]
-      },
-      "전라북도": {
-        "고창군": [35.4357, 126.702], "군산시": [35.96778, 126.73667], "김제시": [35.80333, 126.88083],
-        "남원시": [35.41639, 127.39028], "무주군": [36.0069, 127.6608], "부안군": [35.7317, 126.7333],
-        "순창군": [35.3745, 127.1374], "완주군": [35.9046, 127.1618], "익산시": [35.94833, 126.95778],
-        "임실군": [35.6178, 127.2891], "장수군": [35.6472, 127.5209], "전주시": [35.82194, 127.14889],
-        "정읍시": [35.57, 126.855], "진안군": [35.7917, 127.4249]
-      },
-      "전라남도": {
-        "강진군": [34.6421, 126.7671], "고흥군": [34.6113, 127.2851], "곡성군": [35.2819, 127.2921],
-        "광양시": [34.94056, 127.6955], "구례군": [35.2024, 127.4629], "나주시": [35.01583, 126.71667],
-        "담양군": [35.3211, 126.9882], "목포시": [34.81167, 126.39222], "무안군": [34.9905, 126.4816],
-        "보성군": [34.7715, 127.0799], "순천시": [34.95028, 127.48778], "신안군": [34.8319, 126.1067],
-        "여수시": [34.76028, 127.66222], "영광군": [35.2772, 126.5119], "영암군": [34.8, 126.6967],
-        "완도군": [34.3111, 126.7551], "장성군": [35.3018, 126.7847], "장흥군": [34.6813, 126.9066],
-        "진도군": [34.4867, 126.2633], "함평군": [35.0658, 126.5165], "해남군": [34.5732, 126.5992],
-        "화순군": [35.0645, 126.9864]
-      },
-      "경상북도": {
-        "경산시": [35.825, 128.7414], "경주시": [35.85639, 129.22417], "고령군": [35.7264, 128.2629],
-        "구미시": [36.11944, 128.34472], "군위군": [36.2429, 128.5726], "김천시": [36.13972, 128.11333],
-        "문경시": [36.5867, 128.1867], "봉화군": [36.8932, 128.7326], "상주시": [36.41056, 128.15889],
-        "성주군": [35.919, 128.2827], "안동시": [36.56333, 128.72917], "영덕군": [36.4151, 129.3656],
-        "영양군": [36.6664, 129.1123], "영주시": [36.805, 128.62361], "영천시": [35.97306, 128.93861],
-        "예천군": [36.6577, 128.4531], "울릉군": [37.4844, 130.9057], "울진군": [36.9931, 129.4004],
-        "의성군": [36.3527, 128.6971], "청도군": [35.6474, 128.7338], "청송군": [36.4359, 129.057],
-        "칠곡군": [35.9955, 128.4016], "포항시": [36.03806, 129.34278]
-      },
-      "경상남도": {
-        "거제시": [34.88056, 128.62139], "거창군": [35.6866, 127.9095], "고성군": [34.9733, 128.3229],
-        "김해시": [35.22833, 128.88944], "남해군": [34.8375, 127.8925], "밀양시": [35.50361, 128.74639],
-        "사천시": [35.00389, 128.06417], "산청군": [35.4156, 127.8734], "양산시": [35.335, 129.0378],
-        "의령군": [35.3222, 128.2617], "진주시": [35.18028, 128.10778], "창녕군": [35.5444, 128.4922],
-        "창원시": [35.22806, 128.68111], "통영시": [34.85417, 128.43333], "하동군": [35.0674, 127.7511],
-        "함안군": [35.2724, 128.4064], "함양군": [35.5203, 127.7253], "합천군": [35.5666, 128.1656]
-      },
-      "제주특별자치도": {
-        "서귀포시": [33.25417, 126.56028], "제주시": [33.49889, 126.53111]
-      }
-    };
-
-    // Deterministic small offset so posts sharing a district don't fully overlap
-    function jitterOffset(seed) {
-      var a = Math.sin(seed * 9301 + 49297) * 233280;
-      var b = Math.sin(seed * 6151 + 12345) * 233280;
-      return [((a - Math.floor(a)) - 0.5) * 0.06, ((b - Math.floor(b)) - 0.5) * 0.06];
-    }
-
-    // Location selects
-    var sidoSelect = document.getElementById('w-sido');
-    var sigunguSelect = document.getElementById('w-sigungu');
-    Object.keys(KOREA_REGIONS).forEach(function (sido) {
-      var opt = document.createElement('option');
-      opt.value = sido;
-      opt.textContent = sido;
-      sidoSelect.appendChild(opt);
-    });
-    sidoSelect.addEventListener('change', function () {
-      sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
-      var sido = sidoSelect.value;
-      if (!sido) { sigunguSelect.disabled = true; return; }
-      var list = Object.keys(KOREA_REGIONS[sido]);
-      list.forEach(function (sgg) {
-        var opt = document.createElement('option');
-        opt.value = sgg;
-        opt.textContent = sgg;
-        sigunguSelect.appendChild(opt);
-      });
-      sigunguSelect.disabled = false;
-      if (list.length === 1) { sigunguSelect.value = list[0]; }
-    });
-
-    // Map (needs network access to unpkg.com + OpenStreetMap tiles — works on the
-    // deployed site, not inside the sandboxed artifact preview)
-    var boardMap = null;
-    var markerLayer = null;
-    if (typeof L !== 'undefined') {
-      try {
-        var mapEl = document.getElementById('board-map');
-        mapEl.innerHTML = '';
-        boardMap = L.map(mapEl, { scrollWheelZoom: false }).setView([36.4, 127.9], 6.6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 18,
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(boardMap);
-        markerLayer = L.layerGroup().addTo(boardMap);
-      } catch (e) { boardMap = null; markerLayer = null; }
-    }
-
-    function renderMarkers() {
-      if (!markerLayer) return;
-      markerLayer.clearLayers();
-      boardPosts.forEach(function (p, i) {
-        var off = jitterOffset(i + 1);
-        var marker = L.marker([p.lat + off[0], p.lng + off[1]]).addTo(markerLayer);
-        var content = document.createElement('div');
-        var t = document.createElement('div');
-        t.className = 'popup-title';
-        t.textContent = p.title;
-        var m = document.createElement('div');
-        m.className = 'popup-meta';
-        m.textContent = p.author + ' · ' + p.sido + ' ' + p.sigungu;
-        content.appendChild(t);
-        content.appendChild(m);
-        marker.bindPopup(content);
-      });
-    }
-
-    // Board — shared across every visitor via Firestore. If Firestore can't be
-    // reached (blocked network, e.g. inside the sandboxed artifact preview),
-    // new posts still work locally for this one browser tab as a fallback.
-    var boardBody = document.getElementById('board-body');
-    var boardPosts = [];
-
-    function shortSido(sido) {
-      return sido.replace(/(특별자치시|특별자치도|광역시|특별시|도)$/, '');
-    }
-
-    function renderBoard() {
-      boardBody.innerHTML = '';
-      if (boardPosts.length === 0) {
-        var empty = document.createElement('div');
-        empty.className = 'board-empty';
-        empty.textContent = '아직 등록된 글이 없습니다. 첫 번째 글을 남겨보세요.';
-        boardBody.appendChild(empty);
-        return;
-      }
-      var total = boardPosts.length;
-      boardPosts.forEach(function (p, i) {
-        var row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'board-row';
-        row.innerHTML =
-          '<span class="board-row-no"></span>' +
-          '<span class="board-row-main"><span class="board-row-title"></span><span class="board-row-meta"></span></span>' +
-          '<span class="board-row-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-        row.querySelector('.board-row-no').textContent = total - i;
-        row.querySelector('.board-row-title').textContent = p.title;
-        row.querySelector('.board-row-meta').textContent = p.author + ' · ' + shortSido(p.sido) + ' ' + p.sigungu + ' · ' + p.date;
-        row.addEventListener('click', function () { openPostDetail(i); });
-        boardBody.appendChild(row);
-      });
-    }
-
-    var boardListWrap = document.getElementById('board-list-wrap');
-    var boardDetailWrap = document.getElementById('board-detail-wrap');
-    var boardOwnerActions = document.getElementById('board-owner-actions');
-    var currentDetailIndex = null;
-    var editingPostId = null;
-    function openPostDetail(i) {
-      var p = boardPosts[i];
-      if (!p) return;
-      currentDetailIndex = i;
-      document.getElementById('board-detail-title').textContent = p.title;
-      document.getElementById('board-detail-meta').textContent =
-        p.author + ' · ' + shortSido(p.sido) + ' ' + p.sigungu + ' · ' + p.date;
-      document.getElementById('board-detail-body').textContent =
-        p.content && p.content.trim() ? p.content : '작성된 내용이 없습니다.';
-      boardOwnerActions.hidden = !(myUid && p.ownerUid && p.ownerUid === myUid);
-      boardListWrap.hidden = true;
-      boardDetailWrap.hidden = false;
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    }
-    document.getElementById('board-back').addEventListener('click', function () {
-      boardDetailWrap.hidden = true;
-      boardListWrap.hidden = false;
-    });
-
-    document.getElementById('board-edit-btn').addEventListener('click', function () {
-      var p = boardPosts[currentDetailIndex];
-      if (!p) return;
-      editingPostId = p.id;
-      document.getElementById('w-title').value = p.title;
-      document.getElementById('w-author').value = p.author;
-      document.getElementById('w-content').value = p.content || '';
-      sidoSelect.value = p.sido;
-      sidoSelect.dispatchEvent(new Event('change'));
-      sigunguSelect.value = p.sigungu;
-      document.getElementById('write-heading').textContent = '글 수정';
-      document.getElementById('w-submit').textContent = '수정하기';
-      showView('write');
-    });
-
-    document.getElementById('board-delete-btn').addEventListener('click', async function () {
-      var p = boardPosts[currentDetailIndex];
-      if (!p) return;
-      if (!confirm('이 글을 삭제하시겠습니까?')) return;
-      var deleteBtn = document.getElementById('board-delete-btn');
-      deleteBtn.disabled = true;
-      if (p.id && db && myUid) {
-        try {
-          await Promise.race([fsMod.deleteDoc(fsMod.doc(db, 'posts', p.id)), fsTimeout(10000)]);
-          boardDetailWrap.hidden = true;
-          boardListWrap.hidden = false;
-        } catch (e) {
-          console.error('delete failed', e);
-          alert('삭제에 실패했습니다. 잠시 후 다시 시도해주세요.');
-        }
-      } else {
-        boardPosts = boardPosts.filter(function (bp) { return bp !== p; });
-        renderBoard();
-        renderMarkers();
-        boardDetailWrap.hidden = true;
-        boardListWrap.hidden = false;
-      }
-      deleteBtn.disabled = false;
-    });
-
-    function todayStr() {
-      var d = new Date();
-      var mm = String(d.getMonth() + 1).padStart(2, '0');
-      var dd = String(d.getDate()).padStart(2, '0');
-      return d.getFullYear() + '.' + mm + '.' + dd;
-    }
-
-    // Firestore + anonymous auth — dynamic import so a blocked/failed network
-    // request only disables the shared board, never breaks the rest of the page.
-    // Auth identifies "this browser" (no login form), which is what lets a post's
-    // own author edit/delete it later — see the reply in chat for the caveats.
-    var db = null;
-    var postsCollectionRef = null;
-    var fsMod = null;
-    var authMod = null;
-    var myUid = null;
-    function fsTimeout(ms) {
-      return new Promise(function (_, reject) { setTimeout(function () { reject(new Error('timeout')); }, ms); });
-    }
-    var fbReady = (async function () {
-      try {
-        var appMod = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
-        fsMod = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js');
-        var firebaseConfig = {
-          apiKey: "AIzaSyCsEyc_MXatqD-TonIG_ehe33UcVGRnpWg",
-          authDomain: "yeop-2026.firebaseapp.com",
-          projectId: "yeop-2026",
-          storageBucket: "yeop-2026.firebasestorage.app",
-          messagingSenderId: "1025810083822",
-          appId: "1:1025810083822:web:e3cb0b47f94ff08d2b28ff"
-        };
-        var fbApp = appMod.initializeApp(firebaseConfig);
-        db = fsMod.getFirestore(fbApp);
-        postsCollectionRef = fsMod.collection(db, 'posts');
-        var q = fsMod.query(postsCollectionRef, fsMod.orderBy('createdAt', 'desc'));
-        fsMod.onSnapshot(q, function (snapshot) {
-          boardPosts = snapshot.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
-          renderBoard();
-          renderMarkers();
-        }, function (err) {
-          console.error('Firestore listen failed', err);
-        });
-
-        try {
-          authMod = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js');
-          var auth = authMod.getAuth(fbApp);
-          var cred = await authMod.signInAnonymously(auth);
-          myUid = cred.user.uid;
-        } catch (authErr) {
-          console.warn('Anonymous auth unavailable — writing/editing/deleting posts is disabled', authErr);
-        }
-
-        return true;
-      } catch (e) {
-        console.warn('Firestore unavailable — board will not sync across visitors', e);
-        return false;
-      }
-    })();
-
-    document.getElementById('go-write').addEventListener('click', function () {
-      editingPostId = null;
-      document.getElementById('write-heading').textContent = '글쓰기';
-      document.getElementById('w-submit').textContent = '등록하기';
-      showView('write');
-    });
-    document.getElementById('w-cancel').addEventListener('click', function () {
-      resetWriteForm();
-      editingPostId = null;
-      document.getElementById('write-heading').textContent = '글쓰기';
-      document.getElementById('w-submit').textContent = '등록하기';
-      showView('board');
-    });
-
-    var attachOn = false;
-    var attachBtn = document.getElementById('w-attach');
-    var attachLabel = document.getElementById('w-attach-label');
-    attachBtn.addEventListener('click', function () {
-      attachOn = !attachOn;
-      attachBtn.classList.toggle('on', attachOn);
-      attachLabel.textContent = attachOn ? '사진 첨부됨' : '사진 선택';
-    });
-
-    function resetWriteForm() {
-      document.getElementById('w-title').value = '';
-      document.getElementById('w-author').value = '';
-      document.getElementById('w-content').value = '';
-      sidoSelect.value = '';
-      sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
-      sigunguSelect.disabled = true;
-      attachOn = false;
-      attachBtn.classList.remove('on');
-      attachLabel.textContent = '사진 선택';
-      document.getElementById('w-hint').classList.remove('show');
-    }
-
-    var submitBtn = document.getElementById('w-submit');
-    submitBtn.addEventListener('click', async function () {
-      var title = document.getElementById('w-title').value.trim();
-      var author = document.getElementById('w-author').value.trim();
-      var sido = sidoSelect.value;
-      var sigungu = sigunguSelect.value;
-      var hint = document.getElementById('w-hint');
-      if (!title || !author || !sido || !sigungu) {
-        hint.textContent = '제목, 작성자, 위치(시/도·시/군/구)를 입력해주세요.';
-        hint.classList.add('show');
-        return;
-      }
-      var content = document.getElementById('w-content').value.trim();
-      var coords = KOREA_REGIONS[sido][sigungu];
-      var isEdit = !!editingPostId;
-      var busyLabel = isEdit ? '수정 중…' : '등록 중…';
-      var doneLabel = isEdit ? '수정하기' : '등록하기';
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = busyLabel;
-      var connected = await fbReady;
-
-      if (!connected || !postsCollectionRef) {
-        // No shared backend reachable (e.g. offline, or the sandboxed artifact
-        // preview) — keep working for this browser tab only, as a fallback.
-        if (isEdit) {
-          var idx = boardPosts.findIndex(function (p) { return p.id === editingPostId; });
-          if (idx !== -1) {
-            boardPosts[idx] = Object.assign({}, boardPosts[idx], {
-              title: title, author: author, content: content, sido: sido, sigungu: sigungu,
-              lat: coords[0], lng: coords[1]
-            });
-          }
-        } else {
-          boardPosts.unshift({
-            id: 'local-' + Date.now(), ownerUid: 'local',
-            title: title, author: author, content: content, sido: sido, sigungu: sigungu,
-            lat: coords[0], lng: coords[1], date: todayStr()
-          });
-        }
-        renderBoard();
-        renderMarkers();
-        resetWriteForm();
-        editingPostId = null;
-        showView('board');
-        submitBtn.disabled = false;
-        submitBtn.textContent = doneLabel;
-        return;
-      }
-
-      if (!myUid) {
-        hint.textContent = '지금은 글쓰기가 어렵습니다. 잠시 후 다시 시도해주세요.';
-        hint.classList.add('show');
-        submitBtn.disabled = false;
-        submitBtn.textContent = doneLabel;
-        return;
-      }
-
-      try {
-        if (isEdit) {
-          var docRef = fsMod.doc(db, 'posts', editingPostId);
-          await Promise.race([
-            fsMod.updateDoc(docRef, {
-              title: title, author: author, content: content, sido: sido, sigungu: sigungu,
-              lat: coords[0], lng: coords[1]
-            }),
-            fsTimeout(10000)
-          ]);
-        } else {
-          var postData = {
-            title: title, author: author, content: content, sido: sido, sigungu: sigungu,
-            lat: coords[0], lng: coords[1], date: todayStr(),
-            ownerUid: myUid, createdAt: fsMod.serverTimestamp()
-          };
-          await Promise.race([fsMod.addDoc(postsCollectionRef, postData), fsTimeout(10000)]);
-        }
-        resetWriteForm();
-        editingPostId = null;
-        document.getElementById('write-heading').textContent = '글쓰기';
-        showView('board');
-      } catch (e) {
-        console.error('Failed to save post', e);
-        hint.textContent = (isEdit ? '수정' : '등록') + '에 실패했습니다. 잠시 후 다시 시도해주세요.';
-        hint.classList.add('show');
-      }
-      submitBtn.disabled = false;
-      submitBtn.textContent = doneLabel;
-    });
-
-    renderBoard();
-    renderMarkers();
   })();
 </script>
+
