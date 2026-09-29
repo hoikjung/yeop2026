@@ -117,18 +117,19 @@
   .hero-content {
     background: var(--paper-soft);
     display: flex; flex-direction: column; justify-content: center;
-    padding: 56px clamp(28px, 4vw, 64px);
+    padding: 40px clamp(28px, 4vw, 64px) 32px;
   }
   .hero-eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--navy); margin-bottom: 18px; }
+  .hero-name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
   .hero-title { font-size: clamp(34px, 4vw, 50px); line-height: 1.18; color: var(--ink); }
-  .hero-lede { font-size: 15px; line-height: 1.85; color: color-mix(in srgb, var(--ink) 85%, var(--ink-muted)); margin: 24px 0 0; max-width: 46ch; }
-  .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 7px;
-    border: 1px solid var(--navy); color: var(--navy); font-size: 12.5px; font-weight: 700;
-    padding: 7px 14px; border-radius: 3px; letter-spacing: 0.02em; text-decoration: none;
+  .hero-social { display: flex; gap: 8px; }
+  .hero-social-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid var(--navy); color: var(--navy); text-decoration: none; flex: none;
   }
-  .hero-badge:hover { background: var(--navy); color: #fff; }
+  .hero-social-icon:hover { background: var(--navy); color: #fff; }
+  .hero-lede { font-size: 15px; line-height: 1.85; color: color-mix(in srgb, var(--ink) 85%, var(--ink-muted)); margin: 24px 0 0; max-width: 46ch; }
 
   /* Runner game — dodge the obstacles */
   .runner-section { max-width: 1280px; margin: 0 auto; padding: 0 clamp(28px, 4vw, 64px) 64px; }
@@ -351,22 +352,21 @@
       <div class="hero">
         <div class="hero-content">
           <div class="hero-eyebrow">더불어민주당 전국대학생위원장 후보</div>
-          <h1 class="hero-title">강동엽</h1>
-          <p class="hero-lede">2003년 대구 출생. 2022년, 2026년 대구 달성군 군의회 선거에 도전했습니다. 사회단체 윤슬 대표로 활동하며 지역 사회 문제를 해결하고자 노력해왔습니다. 대구시당 청년위원회 대변인, 전국대학생위원회 조직2국장을 역임하며 청년정치의 현실을 마주했습니다. 이제 더불어민주당 전국대학생위원장에 도전합니다.</p>
-          <div class="hero-badges">
-            <a class="hero-badge" href="https://www.instagram.com/dreaming_yeop/" target="_blank" rel="noopener">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg>
-              인스타그램
-            </a>
-            <a class="hero-badge" href="https://blog.naver.com/dalseongyeop" target="_blank" rel="noopener">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.5" text-anchor="middle" font-size="12.5" font-weight="800" fill="currentColor" font-family="Arial, sans-serif">N</text></svg>
-              네이버블로그
-            </a>
-            <a class="hero-badge" href="https://www.facebook.com/profile.php?id=100010645390931" target="_blank" rel="noopener">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.5" text-anchor="middle" font-size="13" font-weight="700" font-style="italic" fill="currentColor" font-family="Georgia, serif">f</text></svg>
-              페이스북
-            </a>
+          <div class="hero-name-row">
+            <h1 class="hero-title">강동엽</h1>
+            <div class="hero-social">
+              <a class="hero-social-icon" href="https://www.instagram.com/dreaming_yeop/" target="_blank" rel="noopener" aria-label="인스타그램">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg>
+              </a>
+              <a class="hero-social-icon" href="https://blog.naver.com/dalseongyeop" target="_blank" rel="noopener" aria-label="네이버블로그">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.5" text-anchor="middle" font-size="12.5" font-weight="800" fill="currentColor" font-family="Arial, sans-serif">N</text></svg>
+              </a>
+              <a class="hero-social-icon" href="https://www.facebook.com/profile.php?id=100010645390931" target="_blank" rel="noopener" aria-label="페이스북">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.5" text-anchor="middle" font-size="13" font-weight="700" font-style="italic" fill="currentColor" font-family="Georgia, serif">f</text></svg>
+              </a>
+            </div>
           </div>
+          <p class="hero-lede">2003년 대구 출생. 2022년, 2026년 대구 달성군 군의회 선거에 도전했습니다. 사회단체 윤슬 대표로 활동하며 지역 사회 문제를 해결하고자 노력해왔습니다. 대구 달성군 대학생위원장, 전국대학생위원회 조직2국장을 역임하며 청년정치의 현실을 마주했습니다. 이제 더불어민주당 전국대학생위원장에 도전합니다.</p>
         </div>
       </div>
 
@@ -703,8 +703,8 @@
       <h1 class="logo display">동<b>BTI</b></h1>
       <p class="slogan display"><mark>모두의 대학위!</mark></p>
       <div class="notes">
-        <p>* MBTI 심리 테스트를 모방했지만 내용은 같지 않습니다.</p>
-        <p>** 전문가적 견해로 만든 테스트가 아닙니다! 잠깐 고민하고 웃어보자는 취지예요 ^^;;</p>
+        <p>* 본 테스트는 전문적인 진단 목적의 검사가 아닙니다.</p>
+        <p>** 단 몇 가지 질문으로 개인의 성향을 단정 지을 수는 없습니다!</p>
       </div>
     </div>
     <div class="axes" style="margin-top:24px">
@@ -834,7 +834,7 @@
   var bestEl = document.getElementById('runner-best');
   var homeView = document.getElementById('view-home');
 
-  var OBSTACLE_LABELS = ["구태정치", "지역주의", "포퓰리즘", "내로남불", "지방소멸", "저성장", "진영싸움"];
+  var OBSTACLE_LABELS = ["구태정치", "지역주의", "포퓰리즘", "내로남불", "지방소멸", "저성장", "진영싸움", "인구위기", "청년실업", "밀실공천", "양극화"];
 
   var W = 0, H = 0, DPR = 1;
   function resize() {
