@@ -130,6 +130,26 @@
   }
   .hero-badge:hover { background: var(--navy); color: #fff; }
 
+  /* Runner game — dodge the obstacles */
+  .runner-section { max-width: 1280px; margin: 0 auto; padding: 0 clamp(28px, 4vw, 64px) 64px; }
+  .runner-card { background: var(--paper-soft); border-radius: 4px; padding: 24px clamp(20px, 3vw, 36px) 28px; }
+  .runner-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .runner-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; color: var(--navy); margin-bottom: 4px; }
+  .runner-title { font-family: 'Noto Serif KR', serif; font-weight: 800; font-size: 18px; color: var(--ink); }
+  .runner-score { font-size: 12.5px; font-weight: 700; color: var(--ink-muted); font-variant-numeric: tabular-nums; display: flex; gap: 16px; letter-spacing: 0.02em; }
+  .runner-score b { color: var(--navy); font-size: 15px; margin: 0 3px; font-weight: 800; }
+  .runner-best { display: inline-flex; align-items: baseline; }
+  .runner-stage { position: relative; width: 100%; border-radius: 4px; overflow: hidden; background: var(--paper); border: 1px solid var(--line); }
+  #runner-canvas { display: block; width: 100%; height: 220px; touch-action: none; cursor: pointer; }
+  .runner-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; background: color-mix(in srgb, var(--paper) 80%, transparent); cursor: pointer; padding: 0 24px; }
+  .runner-overlay[hidden] { display: none; }
+  .runner-overlay-title { font-weight: 800; font-size: 15px; color: var(--ink); }
+  .runner-overlay-sub { font-size: 12.5px; color: var(--ink-muted); line-height: 1.6; }
+  .runner-hint { margin: 10px 0 0; font-size: 12px; color: var(--ink-muted); text-align: center; }
+  @media (max-width: 560px) {
+    #runner-canvas { height: 170px; }
+  }
+
 
   /* Generic view padding */
   .view-pad { padding-top: 72px; padding-bottom: 108px; }
@@ -346,6 +366,26 @@
               페이스북
             </a>
           </div>
+        </div>
+      </div>
+
+      <div class="runner-section">
+        <div class="runner-card">
+          <div class="runner-head">
+            <div>
+              <div class="runner-eyebrow">PLAY</div>
+              <div class="runner-title">구태정치를 피하라!</div>
+            </div>
+            <div class="runner-score">SCORE <b id="runner-score">0</b><span class="runner-best">BEST <b id="runner-best">0</b></span></div>
+          </div>
+          <div class="runner-stage">
+            <canvas id="runner-canvas"></canvas>
+            <div class="runner-overlay" id="runner-overlay">
+              <p class="runner-overlay-title" id="runner-overlay-title">스페이스바 또는 화면을 눌러 시작</p>
+              <p class="runner-overlay-sub">구태정치 · 지역주의 · 포퓰리즘 같은 장애물을 뛰어넘으세요</p>
+            </div>
+          </div>
+          <p class="runner-hint">스페이스바 · ↑ · 화면 터치로 점프</p>
         </div>
       </div>
 
@@ -780,6 +820,252 @@
 
   <footer>© 2026 강동엽 캠프 · 더불어민주당 전국대학생위원장 후보</footer>
 </div>
+
+<script>
+(function () {
+  var canvas = document.getElementById('runner-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var stage = canvas.parentElement;
+  var overlay = document.getElementById('runner-overlay');
+  var overlayTitle = document.getElementById('runner-overlay-title');
+  var scoreEl = document.getElementById('runner-score');
+  var bestEl = document.getElementById('runner-best');
+  var homeView = document.getElementById('view-home');
+
+  var OBSTACLE_LABELS = ["구태정치", "지역주의", "포퓰리즘", "내로남불", "지방소멸", "저성장", "진영싸움"];
+
+  var W = 0, H = 0, DPR = 1;
+  function resize() {
+    var rect = stage.getBoundingClientRect();
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(1, Math.round(rect.width));
+    H = Math.max(1, Math.round(rect.height));
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  var GROUND_Y, GRAVITY, JUMP_V;
+  function tuneConstants() {
+    GROUND_Y = H - 28;
+    GRAVITY = H * 0.0034;
+    JUMP_V = -H * 0.052;
+  }
+
+  var best = 0;
+  try { best = parseInt(localStorage.getItem('dongyeop-runner-best') || '0', 10) || 0; } catch (e) { best = 0; }
+  bestEl.textContent = best;
+
+  var state = 'idle'; // idle | running | over
+  var runner, obstacles, score, speed, spawnAt, dist, legPhase, lastHit;
+
+  function resetGame() {
+    runner = { x: 44, y: 0, vy: 0, w: 26, h: 34, grounded: true };
+    runner.y = GROUND_Y - runner.h;
+    obstacles = [];
+    score = 0;
+    speed = H * 0.026;
+    dist = 0;
+    spawnAt = 60;
+    legPhase = 0;
+    lastHit = null;
+  }
+
+  function pickLabel() {
+    return OBSTACLE_LABELS[Math.floor(Math.random() * OBSTACLE_LABELS.length)];
+  }
+
+  function spawnObstacle() {
+    ctx.font = '700 13px "Noto Sans KR", sans-serif';
+    var label = pickLabel();
+    var textW = ctx.measureText(label).width;
+    var w = Math.max(58, textW + 24);
+    var h = 30;
+    obstacles.push({ x: W + 10, y: GROUND_Y - h, w: w, h: h, label: label, passed: false });
+  }
+
+  function jump() {
+    if (state === 'idle') { startGame(); return; }
+    if (state === 'over') { resetGame(); startGame(); return; }
+    if (state === 'running' && runner.grounded) {
+      runner.vy = JUMP_V;
+      runner.grounded = false;
+    }
+  }
+
+  function startGame() {
+    state = 'running';
+    overlay.hidden = true;
+  }
+
+  function endGame() {
+    state = 'over';
+    if (score > best) {
+      best = score;
+      bestEl.textContent = best;
+      try { localStorage.setItem('dongyeop-runner-best', String(best)); } catch (e) {}
+    }
+    overlayTitle.textContent = (lastHit ? '「' + lastHit + '」에 걸려 넘어졌습니다!' : '넘어졌습니다!') + '  ·  점수 ' + score;
+    overlay.querySelector('.runner-overlay-sub').textContent = '탭하거나 스페이스바를 눌러 다시 시작하세요';
+    overlay.hidden = false;
+  }
+
+  function update() {
+    dist += speed;
+    speed = Math.min(H * 0.075, H * 0.026 + dist * 0.00006);
+    score = Math.floor(dist / (H * 0.12));
+    scoreEl.textContent = score;
+
+    runner.vy += GRAVITY;
+    runner.y += runner.vy;
+    if (runner.y >= GROUND_Y - runner.h) {
+      runner.y = GROUND_Y - runner.h;
+      runner.vy = 0;
+      runner.grounded = true;
+    }
+
+    spawnAt -= speed;
+    if (spawnAt <= 0) {
+      spawnObstacle();
+      spawnAt = Math.max(46, 90 - speed * 3) + Math.random() * 50;
+    }
+
+    var rx1 = runner.x + 4, rx2 = runner.x + runner.w - 4, ry1 = runner.y + 3, ry2 = runner.y + runner.h;
+    for (var i = obstacles.length - 1; i >= 0; i--) {
+      var o = obstacles[i];
+      o.x -= speed;
+      if (o.x + o.w < -10) { obstacles.splice(i, 1); continue; }
+      var ox1 = o.x + 3, ox2 = o.x + o.w - 3, oy1 = o.y + 3, oy2 = o.y + o.h;
+      if (rx1 < ox2 && rx2 > ox1 && ry1 < oy2 && ry2 > oy1) {
+        lastHit = o.label;
+        endGame();
+      }
+    }
+  }
+
+  function drawRunner() {
+    var x = runner.x, y = runner.y, w = runner.w, h = runner.h;
+    var navy = getComputedStyle(document.documentElement).getPropertyValue('--navy').trim() || '#17325c';
+    ctx.fillStyle = navy;
+    ctx.strokeStyle = navy;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    // head
+    ctx.beginPath();
+    ctx.arc(x + w * 0.5, y + h * 0.14, h * 0.14, 0, Math.PI * 2);
+    ctx.fill();
+    // torso
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, y + h * 0.26);
+    ctx.lineTo(x + w * 0.5, y + h * 0.62);
+    ctx.stroke();
+    if (runner.grounded) {
+      var swing = Math.sin(legPhase) * (w * 0.34);
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.5, y + h * 0.62);
+      ctx.lineTo(x + w * 0.5 + swing, y + h);
+      ctx.moveTo(x + w * 0.5, y + h * 0.62);
+      ctx.lineTo(x + w * 0.5 - swing, y + h);
+      ctx.stroke();
+      var armSwing = Math.sin(legPhase + Math.PI) * (w * 0.22);
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.5, y + h * 0.34);
+      ctx.lineTo(x + w * 0.5 + armSwing, y + h * 0.5);
+      ctx.moveTo(x + w * 0.5, y + h * 0.34);
+      ctx.lineTo(x + w * 0.5 - armSwing, y + h * 0.5);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.5, y + h * 0.62);
+      ctx.lineTo(x + w * 0.24, y + h * 0.9);
+      ctx.moveTo(x + w * 0.5, y + h * 0.62);
+      ctx.lineTo(x + w * 0.78, y + h * 0.98);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.5, y + h * 0.34);
+      ctx.lineTo(x + w * 0.2, y + h * 0.28);
+      ctx.moveTo(x + w * 0.5, y + h * 0.34);
+      ctx.lineTo(x + w * 0.82, y + h * 0.42);
+      ctx.stroke();
+    }
+  }
+
+  function drawObstacle(o) {
+    var navy = getComputedStyle(document.documentElement).getPropertyValue('--navy').trim() || '#17325c';
+    var paper = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim() || '#fff';
+    var r = o.h / 2;
+    ctx.beginPath();
+    ctx.moveTo(o.x + r, o.y);
+    ctx.arcTo(o.x + o.w, o.y, o.x + o.w, o.y + o.h, r);
+    ctx.arcTo(o.x + o.w, o.y + o.h, o.x, o.y + o.h, r);
+    ctx.arcTo(o.x, o.y + o.h, o.x, o.y, r);
+    ctx.arcTo(o.x, o.y, o.x + o.w, o.y, r);
+    ctx.closePath();
+    ctx.fillStyle = paper;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = navy;
+    ctx.stroke();
+    ctx.fillStyle = navy;
+    ctx.font = '700 13px "Noto Sans KR", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(o.label, o.x + o.w / 2, o.y + o.h / 2 + 1);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    var line = getComputedStyle(document.documentElement).getPropertyValue('--line').trim() || '#dde2ea';
+    ctx.strokeStyle = line;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, GROUND_Y + 0.5);
+    ctx.lineTo(W, GROUND_Y + 0.5);
+    ctx.stroke();
+    drawRunner();
+    for (var i = 0; i < obstacles.length; i++) drawObstacle(obstacles[i]);
+  }
+
+  function loop() {
+    requestAnimationFrame(loop);
+    if (!homeView.classList.contains('active')) return;
+    if (state === 'running') {
+      legPhase += 0.35 + speed * 0.03;
+      update();
+    }
+    draw();
+  }
+
+  function onResize() {
+    var prevState = state;
+    resize();
+    tuneConstants();
+    if (!runner || prevState === 'idle') resetGame();
+    else {
+      runner.y = Math.min(runner.y, GROUND_Y - runner.h);
+    }
+  }
+
+  window.addEventListener('resize', onResize);
+  resize();
+  tuneConstants();
+  resetGame();
+  draw();
+
+  stage.addEventListener('pointerdown', function (e) { e.preventDefault(); jump(); });
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+      if (homeView.classList.contains('active')) {
+        e.preventDefault();
+        jump();
+      }
+    }
+  });
+
+  requestAnimationFrame(loop);
+})();
+</script>
 
 <script>
   (function () {
