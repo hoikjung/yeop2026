@@ -211,7 +211,8 @@
   @media (max-width: 760px) {
     .press-grid { grid-template-columns: 1fr; gap: 28px; }
     .focus-item { grid-template-columns: 1fr; gap: 6px; }
-    .photo-row img { height: 168px; }
+    .photo-row { flex-direction: column; }
+    .photo-row img { height: auto; }
   }
 
   /* 동BTI — 성향 테스트 위젯 (별도 스코프, 사이트 변수와 충돌 방지) */
