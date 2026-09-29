@@ -846,11 +846,14 @@
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
 
-  var GROUND_Y, GRAVITY, JUMP_V;
+  var GROUND_Y, GRAVITY, JUMP_V, AIR_FRAMES, MIN_SPEED, MAX_SPEED;
   function tuneConstants() {
     GROUND_Y = H - 28;
-    GRAVITY = H * 0.0034;
-    JUMP_V = -H * 0.052;
+    GRAVITY = H * 0.0044;
+    JUMP_V = -H * 0.05;
+    AIR_FRAMES = 2 * Math.abs(JUMP_V) / GRAVITY;
+    MIN_SPEED = H * 0.026;
+    MAX_SPEED = H * 0.075;
   }
 
   var best = 0;
@@ -865,9 +868,9 @@
     runner.y = GROUND_Y - runner.h;
     obstacles = [];
     score = 0;
-    speed = H * 0.026;
+    speed = MIN_SPEED;
     dist = 0;
-    spawnAt = speed * 80;
+    spawnAt = speed * AIR_FRAMES * 2.6;
     legPhase = 0;
     lastHit = null;
   }
@@ -911,7 +914,7 @@
 
   function update() {
     dist += speed;
-    speed = Math.min(H * 0.075, H * 0.026 + dist * 0.00006);
+    speed = Math.min(MAX_SPEED, MIN_SPEED + dist * 0.00006);
     score = Math.floor(dist / (H * 0.12));
     scoreEl.textContent = score;
 
@@ -926,7 +929,13 @@
     spawnAt -= speed;
     if (spawnAt <= 0) {
       spawnObstacle();
-      spawnAt = speed * (58 + Math.random() * 34);
+      // buffer shrinks from a very safe 2.6x the minimum clearable distance
+      // down to a tight-but-fair 1.15x as speed ramps up toward MAX_SPEED
+      var t = Math.min(1, (speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED));
+      var buffer = 2.6 - t * 1.45;
+      var gap = speed * AIR_FRAMES * buffer;
+      var jitter = gap * (0.9 + Math.random() * 0.2);
+      spawnAt = Math.max(speed * AIR_FRAMES * 1.05, jitter);
     }
 
     var rx1 = runner.x + 4, rx2 = runner.x + runner.w - 4, ry1 = runner.y + 3, ry2 = runner.y + runner.h;
@@ -1000,12 +1009,12 @@
     ctx.closePath();
     ctx.fillStyle = navy;
     ctx.fill();
-    // label laid flat on the ground, right at the marker's base
+    // label sits below the ground line so it never overlaps the marker
     ctx.fillStyle = navy;
     ctx.font = '700 11px "Noto Sans KR", sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText(o.label, cx, GROUND_Y - 3);
+    ctx.textBaseline = 'top';
+    ctx.fillText(o.label, cx, GROUND_Y + 7);
   }
 
   function draw() {
