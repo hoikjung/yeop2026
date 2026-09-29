@@ -867,7 +867,7 @@
     score = 0;
     speed = H * 0.026;
     dist = 0;
-    spawnAt = 60;
+    spawnAt = speed * 80;
     legPhase = 0;
     lastHit = null;
   }
@@ -877,11 +877,9 @@
   }
 
   function spawnObstacle() {
-    ctx.font = '700 13px "Noto Sans KR", sans-serif';
     var label = pickLabel();
-    var textW = ctx.measureText(label).width;
-    var w = Math.max(58, textW + 24);
-    var h = 30;
+    var h = 30 + Math.random() * 14;
+    var w = 14 + Math.random() * 6;
     obstacles.push({ x: W + 10, y: GROUND_Y - h, w: w, h: h, label: label, passed: false });
   }
 
@@ -928,7 +926,7 @@
     spawnAt -= speed;
     if (spawnAt <= 0) {
       spawnObstacle();
-      spawnAt = Math.max(46, 90 - speed * 3) + Math.random() * 50;
+      spawnAt = speed * (58 + Math.random() * 34);
     }
 
     var rx1 = runner.x + 4, rx2 = runner.x + runner.w - 4, ry1 = runner.y + 3, ry2 = runner.y + runner.h;
@@ -993,25 +991,21 @@
 
   function drawObstacle(o) {
     var navy = getComputedStyle(document.documentElement).getPropertyValue('--navy').trim() || '#17325c';
-    var paper = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim() || '#fff';
-    var r = o.h / 2;
+    var cx = o.x + o.w / 2;
+    // narrow spike marker
     ctx.beginPath();
-    ctx.moveTo(o.x + r, o.y);
-    ctx.arcTo(o.x + o.w, o.y, o.x + o.w, o.y + o.h, r);
-    ctx.arcTo(o.x + o.w, o.y + o.h, o.x, o.y + o.h, r);
-    ctx.arcTo(o.x, o.y + o.h, o.x, o.y, r);
-    ctx.arcTo(o.x, o.y, o.x + o.w, o.y, r);
+    ctx.moveTo(cx, o.y);
+    ctx.lineTo(o.x + o.w, o.y + o.h);
+    ctx.lineTo(o.x, o.y + o.h);
     ctx.closePath();
-    ctx.fillStyle = paper;
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = navy;
-    ctx.stroke();
     ctx.fillStyle = navy;
-    ctx.font = '700 13px "Noto Sans KR", sans-serif';
+    ctx.fill();
+    // label laid flat on the ground, right at the marker's base
+    ctx.fillStyle = navy;
+    ctx.font = '700 11px "Noto Sans KR", sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(o.label, o.x + o.w / 2, o.y + o.h / 2 + 1);
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(o.label, cx, GROUND_Y - 3);
   }
 
   function draw() {
